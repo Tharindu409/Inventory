@@ -1,6 +1,6 @@
 # IntelliJ / IDE
 .idea/
-
+/node_modules
 # Frontend
 /frontend/node_modules/
 /frontend/build/
