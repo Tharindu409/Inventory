@@ -1,6 +1,12 @@
 package backend.exception;
 
-public class InventpyNotFoundException extends RuntimeException{
+public class InventoryNotFoundException extends RuntimeException{
 
-    public Invent
+    public InventoryNotFoundException(Long id){
+        super("could not find id "+id);
+
+    }
+    public InventoryNotFoundException (String message){
+        super(message);
+    }
 }

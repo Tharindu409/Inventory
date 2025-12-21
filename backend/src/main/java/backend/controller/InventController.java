@@ -12,41 +12,34 @@ import java.nio.file.Paths;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
-@RequestMapping("/inventory")
-public class InventController {
+ public class InventController {
 
     @Autowired
     private InventRepository inventRepository;
 
-    // SAVE INVENTORY
-    @PostMapping
-    public InventModel saveInventory(@RequestBody InventModel inventory) {
-        return inventRepository.save(inventory);
+    @PostMapping("/inventory")
+    public InventModel newInventoryModel(@RequestBody InventModel newInventoryModel){
+        return inventRepository.save(newInventoryModel);
     }
 
-    // IMAGE UPLOAD
-    @PostMapping(value = "/itemImg", consumes = "multipart/form-data")
-    public String uploadImage(@RequestPart("file") MultipartFile file) {
-
-        if (file.isEmpty()) {
-            return "error";
-        }
-
-        String uploadDir = System.getProperty("user.dir") + "/uploads/";
-        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+    @PostMapping("/inventory/itemImg")
+    public String itemImage(@RequestParam("file") MultipartFile file) {
+        String folder = "src/main/uploads/";
+        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename(); // avoid duplicates
 
         try {
-            File dir = new File(uploadDir);
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
+            File dir = new File(folder);
+            if (!dir.exists()) dir.mkdirs();
 
-            file.transferTo(Paths.get(uploadDir + fileName));
+            file.transferTo(Paths.get(folder + fileName));
         } catch (IOException e) {
             e.printStackTrace();
-            return "error";
+            return "error uploading file";
         }
 
         return fileName;
     }
+
+
+
 }
