@@ -77,54 +77,51 @@ import java.util.List;
     }
 
 
-    @PutMapping("/inventory/{id}")
+    @PutMapping(value = "/inventory/{id}", consumes = "multipart/form-data")
     public InventModel updateItem(
-            @RequestPart(value = "itemDetails") String itemDetails,
-            @RequestPart(value = "file",required = false)MultipartFile file,
+            @RequestPart("itemDetails") String itemDetails,
+            @RequestPart(value = "file", required = false) MultipartFile file,
             @PathVariable Long id
-    ){
-        System.out.println("Item details: "+file.getOriginalFilename());
-        if(file != null){
-            System.out.println("file received: "+file.getOriginalFilename());
+    ) {
 
-        }else{
-            System.out.println("no file uploaded");
-        }
         ObjectMapper mapper = new ObjectMapper();
         InventModel newInventory;
 
-        try{
-            newInventory = mapper.readValue(itemDetails,InventModel.class);
-
-        }catch (Exception e){
-            throw new RuntimeException("Error parsing iteDetails",e);
-
+        try {
+            newInventory = mapper.readValue(itemDetails, InventModel.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Error parsing itemDetails", e);
         }
 
         return inventRepository.findById(id).map(existingInventory -> {
+
+            // ✅ CORRECT SETTERS
             existingInventory.setItemId(newInventory.getItemId());
-            existingInventory.setItemId(newInventory.getItemName());
-            existingInventory.setItemId(newInventory.getItemCategory());
-            existingInventory.setItemId(newInventory.getItemQty());
-            existingInventory.setItemId(newInventory.getItemDetails());
+            existingInventory.setItemName(newInventory.getItemName());
+            existingInventory.setItemCategory(newInventory.getItemCategory());
+            existingInventory.setItemQty(newInventory.getItemQty());
+            existingInventory.setItemDetails(newInventory.getItemDetails());
 
-            if(file != null && !file.isEmpty()){
-                String folder = "E:/Download/spring/uploads/";
-                String itemImage = file.getOriginalFilename();
+            // ✅ IMAGE UPDATE (OPTIONAL)
+            if (file != null && !file.isEmpty()) {
+                String uploadDir = "E:/Download/spring/uploads/";
+                String fileName = file.getOriginalFilename();
 
-                try{
-                    file.transferTo(Paths.get(folder+itemImage));
-                    existingInventory.setItemImage(itemImage);
+                try {
+                    File dir = new File(uploadDir);
+                    if (!dir.exists()) dir.mkdirs();
 
-                }catch (IOException e){
-                    throw new RuntimeException("error saving uploaded file",e);
+                    file.transferTo(Paths.get(uploadDir + fileName));
+                    existingInventory.setItemImage(fileName);
 
+                } catch (IOException e) {
+                    throw new RuntimeException("Error saving uploaded file", e);
                 }
             }
+
             return inventRepository.save(existingInventory);
 
         }).orElseThrow(() -> new InventoryNotFoundException(id));
     }
-
 
 }
