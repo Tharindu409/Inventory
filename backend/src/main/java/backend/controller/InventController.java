@@ -24,7 +24,7 @@ import java.nio.file.Paths;
 
     @PostMapping("/inventory/itemImg")
     public String itemImage(@RequestParam("file") MultipartFile file) {
-        String folder = "src/main/uploads/";
+        String folder = "E:/Download/spring/backend/src/main/uploads";
         String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename(); // avoid duplicates
 
         try {
