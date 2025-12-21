@@ -1,0 +1,14 @@
+# IntelliJ / IDE
+.idea/
+
+# Frontend
+/frontend/node_modules/
+/frontend/build/
+
+# Backend
+/backend/target/
+/backend/*.iml
+
+# Common
+.env
+.DS_Store
