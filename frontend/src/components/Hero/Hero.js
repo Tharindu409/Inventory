@@ -1,60 +1,79 @@
-import React from 'react'
-import heroImage from '../../assets/invent.jpg'
-import { FaPlay } from 'react-icons/fa'
-
+ import { FaPlay } from 'react-icons/fa';
+import { motion } from 'framer-motion';
+import { SlideRight } from '../../utils/animation';
+import heroBackground from '../../assets/xxxx.jpg';
+ 
 const Hero = () => {
   return (
-    <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 
-  min-h-[650px] items-center gap-12 px-6 relative">
+    <div
+      className="relative w-full min-h-[650px] flex flex-col md:flex-row items-center justify-between px-6 md:px-16 lg:px-24 py-12 md:py-24"
+      style={{
+        backgroundImage: `url(${heroBackground})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
+      {/* Overlay for better text visibility */}
+      <div className="absolute inset-0 bg-black/40 z-0"></div>
 
-  {/* Brand Info */}
-  <div className="flex flex-col justify-center py-16 md:py-0 md:pr-16 xl:pr-40">
-    <div className="text-center md:text-left space-y-6">
+      {/* Brand Info */}
+      <div className="relative z-10 flex flex-col justify-center py-16 md:py-0 md:pr-16 xl:pr-40 text-center md:text-left space-y-6">
+        <motion.p
+          variants={SlideRight(0.2)}
+          initial="hidden"
+          animate="visible"
+          className="text-orange-500 uppercase tracking-wide font-semibold text-lg"
+        >
+          100% Satisfaction Guaranteed
+        </motion.p>
 
-      <p className="text-orange-500 uppercase tracking-wide font-semibold text-sm">
-        100% Satisfaction Guaranteed
-      </p>
+        <motion.h1
+          variants={SlideRight(0.4)}
+          initial="hidden"
+          animate="visible"
+          className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight"
+        >
+          Welcome to <span className="text-green-500">InventorySys</span>
+        </motion.h1>
 
-      <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
-        Welcome to{" "}
-        <span className="text-green-500">InventorySys</span>
-      </h1>
+        <motion.p
+          variants={SlideRight(0.6)}
+          initial="hidden"
+          animate="visible"
+          className="text-white text-base sm:text-lg max-w-xl mx-auto md:mx-0"
+        >
+          Your ultimate solution for{' '}
+          <span className="text-green-500 font-semibold">
+            efficient inventory management
+          </span>{' '}
+          — track stock, manage suppliers, and grow smarter.
+        </motion.p>
 
-      <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto md:mx-0">
-        Your ultimate solution for{" "}
-        <span className="text-primary font-semibold">
-          efficient inventory management
-        </span>{" "}
-        — track stock, manage suppliers, and grow smarter.
-      </p>
+        {/* Buttons */}
+        <motion.div
+          variants={SlideRight(0.8)}
+          initial="hidden"
+          animate="visible"
+          className="flex gap-8 justify-center md:justify-start mt-8 items-center"
+        >
+          <button className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-md font-medium transition">
+            Get Started
+          </button>
 
-      {/* Buttons */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-        <button className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-md font-medium transition">
-          Get Started
-        </button>
-
-        <button>
-            <span className='w-10 h-10 bg-secondary/15'>
-                <FaPlay className="inline-block mr-2 text-green-500"/>
+          <button className="flex justify-center items-center gap-2 font-semibold text-white hover:text-green-500 transition">
+            <span className="w-10 h-10 bg-green-100 rounded-full flex justify-center items-center">
+              <FaPlay className="text-green-500" />
             </span>
-          See how it works
-        </button>
+            See how it works
+          </button>
+        </motion.div>
       </div>
 
+       
+       
     </div>
-  </div>
+  );
+};
 
-  {/* Image Section */}
-  <div className="flex justify-center md:justify-end">
-    <img
-      src={heroImage}
-      alt="Inventory Management"
-      className="w-full max-w-md md:max-w-lg drop-shadow-lg"
-    />
-  </div>
-    </div>
-  )
-}
-
-export default Hero
+export default Hero;
