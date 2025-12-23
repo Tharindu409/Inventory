@@ -36,41 +36,46 @@ const Home = () => {
       {items.length === 0 ? (
         <p className="text-gray-500">No items available</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {items.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition"
-            >
-              {/* Image */}
-              <img
-                src={`http://localhost:8080/uploads/${item.itemImage}`}
-                alt={items.itemImage}
-                className="w-full h-48 object-cover"
-                onError={(e) => (e.target.src = "/no-image.png")}
-              />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+  {items.map((item) => (
+    <div
+      key={item.id}
+      className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1"
+    >
+      {/* Image */}
+      <div className="w-full h-56 overflow-hidden rounded-t-2xl">
+        <img
+          src={`http://localhost:8080/uploads/${item.itemImage}`}
+          alt={item.itemName}
+          className="w-full h-full object-cover object-center transition-transform duration-300 hover:scale-105"
+          onError={(e) => (e.target.src = "/no-image.png")}
+        />
+      </div>
 
-              {/* Details */}
-              <div className="p-4">
-                <h2 className="text-lg font-semibold text-gray-800">
-                  {item.itemName}
-                </h2>
+      {/* Details */}
+      <div className="p-5 flex flex-col gap-2">
+        <h2 className="text-lg font-semibold text-green-600 truncate">
+          {item.itemName}
+        </h2>
 
-                <p className="text-sm text-gray-500 mb-1">
-                  Category: {item.itemCategory}
-                </p>
+        <p className="text-sm text-green-700">
+          <span className="font-medium">Category:</span> {item.itemCategory}
+        </p>
 
-                <p className="text-sm text-gray-500 mb-2">
-                  Quantity: {item.itemQty}
-                </p>
+        <p className="text-sm text-green-700">
+          <span className="font-medium">Quantity:</span> {item.itemQty}
+        </p>
 
-                <p className="text-sm text-gray-600">
-                  {item.itemDetails}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+        <p className="text-sm text-gray-600 line-clamp-3">
+          {item.itemDetails}
+        </p>
+      </div>
+
+       
+    </div>
+  ))}
+</div>
+
       )}
     </div>
   );

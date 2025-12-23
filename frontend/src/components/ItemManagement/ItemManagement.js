@@ -41,7 +41,7 @@ const ItemManagement = () => {
         <h2 className="text-2xl font-bold">Item Management</h2>
         <button
           onClick={() => setAddModalOpen(true)}
-          className="flex items-center gap-2 bg-blue-700 text-white px-4 py-2 rounded"
+          className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded"
         >
           <FaPlus /> Add Item
         </button>
@@ -49,7 +49,7 @@ const ItemManagement = () => {
 
       {/* TABLE */}
       <table className="min-w-full bg-white shadow rounded">
-        <thead className="bg-blue-600 text-white">
+        <thead className="bg-white-100 text-black">
           <tr>
             <th className="px-4 py-2">DB ID</th>
             <th className="px-4 py-2">Image</th>

@@ -149,7 +149,7 @@ const AddItem = () => {
 
       <button
         type="submit"
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-md transition"
+        className="w-full bg-black hover:bg-gray-700 text-white font-medium py-2 rounded-md transition"
       >
         Add Item
       </button>
