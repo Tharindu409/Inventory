@@ -22,11 +22,22 @@ const ItemManagement = () => {
       console.error("Failed to load items", error);
     }
   };
-
+//delete function
   const deleteItem = async (id) => {
-    if (!window.confirm("Delete this item?")) return;
-    await axios.delete(`http://localhost:8080/inventory/${id}`);
-    setItems(items.filter(item => item.id !== id));
+   //display confirmation message
+   const confirmDelete = window.confirm("Are you sure you want to delete this item?"
+
+   );
+   if(confirmDelete){
+    try{
+      await axios.delete(`http://localhost:8080/inventory/${id}`);
+      //reload items after deletion
+      loadItems();  
+
+    }catch(error){
+      console.error("Failed to delete item", error);
+    }
+   }
   };
 
   const editItem = (id) => {

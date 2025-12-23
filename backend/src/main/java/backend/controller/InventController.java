@@ -122,6 +122,35 @@ import java.util.List;
             return inventRepository.save(existingInventory);
 
         }).orElseThrow(() -> new InventoryNotFoundException(id));
+
+
+
     }
+    //delete part
+    @DeleteMapping("/inventory/{id}")
+    String deleteItem(@PathVariable Long id){
+        // check the items are exists in the db
+        InventModel inventItem = inventRepository.findById(id).orElseThrow(()->new InventoryNotFoundException(id));
+
+        //image delete part
+        String itemImage = inventItem.getItemImage();
+        if(itemImage!=null&&!itemImage.isEmpty()){
+            File imageFile = new File("E:/Download/spring/uploads/"+itemImage);
+            if(imageFile.exists()){
+                if(imageFile.delete()){
+                    System.out.println("image was deleted");
+                }else{
+                    System.out.println("image deletion was failed!!");
+
+                }
+            }
+            //delete item from the repo
+            inventRepository.deleteById(id);
+            return "data with id "+id+ "and image deleted";
+
+        }
+        return itemImage;
+    }
+
 
 }
