@@ -4,7 +4,7 @@ import { FaDashcube } from "react-icons/fa";
 
 const Navbar = () => {
   return (
-    <nav className="bg-gray-900 text-gray-200 px-6 py-4 flex items-center justify-between">
+    <nav className="bg-green-600 text-gray-200 px-6 py-4 flex items-center justify-between">
       
       {/* Logo */}
       <div className="text-xl font-bold text-white">
@@ -39,7 +39,7 @@ const Navbar = () => {
       {/* Logout */}
       <Link
           to="/AdminDashBoard"
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition"
+          className="flex items-center gap-2 bg-black-60 text-white px-4 py-2 rounded-lg text-sm transition"
         >
           <FaDashcube />
           Admin Panel

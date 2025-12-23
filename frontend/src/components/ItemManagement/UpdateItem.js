@@ -1,13 +1,8 @@
- import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
 
-const UpdateItem = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-
+const UpdateItem = ({ itemId, onUpdated }) => {
   const [formData, setFormData] = useState({
-    itemId: "",
     itemName: "",
     itemCategory: "",
     itemQty: "",
@@ -15,37 +10,25 @@ const UpdateItem = () => {
     itemImage: null
   });
 
-  // LOAD ITEM DATA
   useEffect(() => {
     const loadItem = async () => {
-      try {
-        const res = await axios.get(`http://localhost:8080/inventory/${id}`);
-        setFormData({
-          itemId: res.data.itemId,
-          itemName: res.data.itemName,
-          itemCategory: res.data.itemCategory,
-          itemQty: res.data.itemQty,
-          itemDetails: res.data.itemDetails,
-          itemImage: null
-        });
-      } catch (err) {
-        console.error(err);
-        alert("Failed to load item");
-      }
+      const res = await axios.get(`http://localhost:8080/inventory/${itemId}`);
+      setFormData({
+        itemName: res.data.itemName,
+        itemCategory: res.data.itemCategory,
+        itemQty: res.data.itemQty,
+        itemDetails: res.data.itemDetails,
+        itemImage: null
+      });
     };
     loadItem();
-  }, [id]);
+  }, [itemId]);
 
-  // INPUT CHANGE
   const onInputChange = (e) => {
     const { name, value, files } = e.target;
-    setFormData({
-      ...formData,
-      [name]: files ? files[0] : value
-    });
+    setFormData({ ...formData, [name]: files ? files[0] : value });
   };
 
-  // SUBMIT UPDATE
   const onSubmit = async (e) => {
     e.preventDefault();
 
@@ -53,7 +36,6 @@ const UpdateItem = () => {
     data.append(
       "itemDetails",
       JSON.stringify({
-        itemId: formData.itemId,
         itemName: formData.itemName,
         itemCategory: formData.itemCategory,
         itemQty: formData.itemQty,
@@ -65,58 +47,34 @@ const UpdateItem = () => {
       data.append("file", formData.itemImage);
     }
 
-    try {
-      await axios.put(
-        `http://localhost:8080/inventory/${id}`,
-        data,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
+    await axios.put(
+      `http://localhost:8080/inventory/${itemId}`,
+      data,
+      { headers: { "Content-Type": "multipart/form-data" } }
+    );
 
-      alert("Item updated successfully");
-      navigate("/AdminDashBoard");
-
-    } catch (err) {
-      console.error(err);
-      alert("Failed to update item");
-    }
+    alert("Item updated successfully");
+    onUpdated();
   };
 
   return (
-    <form
-      onSubmit={onSubmit}
-      className="max-w-md mx-auto mt-6 p-5 bg-white rounded-xl shadow space-y-3"
-    >
+    <form onSubmit={onSubmit} className="space-y-3">
       <h2 className="text-xl font-bold text-center">Update Item</h2>
-
-      <input
-        name="itemId"
-        value={formData.itemId}
-        onChange={onInputChange}
-        placeholder="Item ID"
-        className="w-full border p-2 rounded"
-      />
-
-      <input
-        type="file"
-        name="itemImage"
-        onChange={onInputChange}
-        className="w-full"
-      />
 
       <input
         name="itemName"
         value={formData.itemName}
         onChange={onInputChange}
-        placeholder="Item Name"
         className="w-full border p-2 rounded"
+        placeholder="Item Name"
       />
 
       <input
         name="itemCategory"
         value={formData.itemCategory}
         onChange={onInputChange}
-        placeholder="Category"
         className="w-full border p-2 rounded"
+        placeholder="Category"
       />
 
       <input
@@ -124,17 +82,19 @@ const UpdateItem = () => {
         name="itemQty"
         value={formData.itemQty}
         onChange={onInputChange}
-        placeholder="Quantity"
         className="w-full border p-2 rounded"
+        placeholder="Quantity"
       />
 
       <textarea
         name="itemDetails"
         value={formData.itemDetails}
         onChange={onInputChange}
-        placeholder="Details"
         className="w-full border p-2 rounded"
+        placeholder="Details"
       />
+
+      <input type="file" name="itemImage" onChange={onInputChange} />
 
       <button className="w-full bg-blue-600 text-white py-2 rounded">
         Update Item

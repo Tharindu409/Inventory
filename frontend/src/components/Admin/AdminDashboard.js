@@ -1,11 +1,9 @@
 import   { useState } from "react";
 import { FaPlus, FaUser, FaTimes } from "react-icons/fa";
 import ItemManagement from "../ItemManagement/ItemManagement";
-import UpdateItem from "../ItemManagement/UpdateItem";
-
-
-import UsersManagement from "../../components/UseManagement/USerManagement"; // Import UsersManagement component
  
+
+import UsersManagement from "../../components/UseManagement/USerManagement";  
 const AdminDashboard = () => {
   const [activeModal, setActiveModal] = useState(null);  
 
@@ -16,8 +14,8 @@ const AdminDashboard = () => {
         return <ItemManagement />;
       case "users":
         return <UsersManagement />;
-      case "updateitem/:id":
-        return <UpdateItem/>
+       
+        
       default:
         return null;
     }
