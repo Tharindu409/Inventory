@@ -1,8 +1,7 @@
  import { useEffect, useState } from "react";
-import { FaDashcube } from "react-icons/fa";
-import { Link } from "react-router-dom";
-import axios from "axios";
 
+import axios from "axios";
+ 
 const Home = () => {
   const [items, setItems] = useState([]);
 
@@ -19,22 +18,18 @@ const Home = () => {
     }
   };
 
+
   return (
+    
     <div className="min-h-screen bg-gray-100 p-6">
 
-      {/* Top Bar */}
+      
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">
           Available Items
         </h1>
 
-        <Link
-          to="/AdminDashBoard"
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition"
-        >
-          <FaDashcube />
-          Admin Panel
-        </Link>
+        
       </div>
 
       {/* Items Grid */}
