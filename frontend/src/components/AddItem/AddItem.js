@@ -70,6 +70,7 @@ const AddItem = () => {
       });
 
       navigate("/home");
+      
     } catch (err) {
       console.error(err);
       alert("Failed to add item");

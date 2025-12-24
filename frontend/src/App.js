@@ -5,31 +5,31 @@ import AdminDashBoard from "./components/Admin/AdminDashboard";
 import UpdateItem from "./components/ItemManagement/UpdateItem"; 
 import Footer from "./components/footer/footer";
 import Navbar from "./components/Navbar/Nav";
-import Hero from "./components/Hero/Hero";
-
-  
+import Register from "./components/User/Register/Register";
+import LandingPage from "./components/User/LandingPage";
+import Login from "./components/User/Login/Login";
 
 function App() {
   return (
     
     <>
     <Navbar />
-    
     <Routes>
        <Route path="/AdminDashBoard" element={<AdminDashBoard/>}/>
       
       <Route path="/" element={
-        <>
-        <Hero />
-        <Home />
-        </>
-        }
-       />
+        <LandingPage />}
+      />
       <Route path="/home" element={<Home />} />
       <Route path="/updateitem/:id" element={<UpdateItem />} />
+       <Route path="/additem" element={<AddItem />} />
 
-      <Route path="/additem" element={<AddItem />} />
-       
+       {/* User Registration and login */}
+
+       <Route path="/register" element={<Register />} />
+      <Route path="/login" element={<Login />} />
+
+
       
     </Routes>
     <Footer/>

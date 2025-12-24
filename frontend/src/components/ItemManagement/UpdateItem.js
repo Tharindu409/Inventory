@@ -96,7 +96,7 @@ const UpdateItem = ({ itemId, onUpdated }) => {
 
       <input type="file" name="itemImage" onChange={onInputChange} />
 
-      <button className="w-full bg-blue-600 text-white py-2 rounded">
+      <button className="w-full bg-black text-white py-2 rounded">
         Update Item
       </button>
     </form>
