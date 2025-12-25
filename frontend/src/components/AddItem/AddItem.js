@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { FaImage, FaTag, FaBox, FaList } from "react-icons/fa";
+import { FaImage, FaTag, FaBox, FaList, FaDollarSign, FaExclamationTriangle, FaMapMarkerAlt } from "react-icons/fa";
 
 const AddItem = () => {
   const navigate = useNavigate();
@@ -11,7 +11,10 @@ const AddItem = () => {
     itemName: "",
     itemCategory: "",
     itemQty: "",
-    itemDetails: ""
+    itemDetails: "",
+    itemPrice: "",       // New Field
+    minStockLimit: "",   // New Field
+    location: ""         // New Field
   });
 
   const onInputChange = (e) => {
@@ -48,13 +51,16 @@ const AddItem = () => {
       return;
     }
 
-    // 2️⃣ Save item (NO itemId)
+    // 2️⃣ Save item (Mapping to your updated InventModel)
     const updatedInventory = {
       itemName: inventory.itemName,
       itemCategory: inventory.itemCategory,
       itemQty: inventory.itemQty,
       itemDetails: inventory.itemDetails,
-      itemImage: imageName
+      itemImage: imageName,
+      itemPrice: parseFloat(inventory.itemPrice),      // New Field
+      minStockLimit: parseInt(inventory.minStockLimit), // New Field
+      location: inventory.location                      // New Field
     };
 
     try {
@@ -66,7 +72,10 @@ const AddItem = () => {
         itemName: "",
         itemCategory: "",
         itemQty: "",
-        itemDetails: ""
+        itemDetails: "",
+        itemPrice: "",
+        minStockLimit: "",
+        location: ""
       });
 
       navigate("/home");
@@ -124,6 +133,20 @@ const AddItem = () => {
         />
       </div>
 
+      {/* NEW: Price */}
+      <div className="flex items-center border rounded-md p-2">
+        <FaDollarSign className="text-gray-400 mr-2" />
+        <input
+          type="number"
+          name="itemPrice"
+          value={inventory.itemPrice}
+          onChange={onInputChange}
+          placeholder="Price"
+          className="w-full outline-none text-sm"
+          required
+        />
+      </div>
+
       {/* Quantity */}
       <div className="flex items-center border rounded-md p-2">
         <FaList className="text-gray-400 mr-2" />
@@ -133,6 +156,33 @@ const AddItem = () => {
           value={inventory.itemQty}
           onChange={onInputChange}
           placeholder="Quantity"
+          className="w-full outline-none text-sm"
+          required
+        />
+      </div>
+
+      {/* NEW: Min Stock Limit */}
+      <div className="flex items-center border rounded-md p-2">
+        <FaExclamationTriangle className="text-gray-400 mr-2" />
+        <input
+          type="number"
+          name="minStockLimit"
+          value={inventory.minStockLimit}
+          onChange={onInputChange}
+          placeholder="Low Stock Alert Limit"
+          className="w-full outline-none text-sm"
+          required
+        />
+      </div>
+
+      {/* NEW: Location */}
+      <div className="flex items-center border rounded-md p-2">
+        <FaMapMarkerAlt className="text-gray-400 mr-2" />
+        <input
+          name="location"
+          value={inventory.location}
+          onChange={onInputChange}
+          placeholder="Storage Location"
           className="w-full outline-none text-sm"
           required
         />

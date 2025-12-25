@@ -8,6 +8,8 @@ import Navbar from "./components/Navbar/Nav";
 import Register from "./components/User/Register/Register";
 import LandingPage from "./components/User/LandingPage";
 import Login from "./components/User/Login/Login";
+import ItemDetails from "./components/ItemDetails/ItemDetails";
+import Cart from "./components/ItemDetails/Cart";
 
 function App() {
   return (
@@ -28,8 +30,9 @@ function App() {
 
        <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/item/:id" element={<ItemDetails />} />
 
-
+      <Route path="/order" element={<Cart/>}/>
       
     </Routes>
     <Footer/>

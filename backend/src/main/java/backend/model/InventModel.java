@@ -17,6 +17,33 @@ public class InventModel {
     private String itemCategory;
     private String itemQty;
     private String itemDetails;
+    private Double ItemPrice;
+    private Integer minStockLimit;
+    private String Location;
+
+    public Double getItemPrice() {
+        return ItemPrice;
+    }
+
+    public void setItemPrice(Double itemPrice) {
+        ItemPrice = itemPrice;
+    }
+
+    public Integer getMinStockLimit() {
+        return minStockLimit;
+    }
+
+    public void setMinStockLimit(Integer minStockLimit) {
+        this.minStockLimit = minStockLimit;
+    }
+
+    public String getLocation() {
+        return Location;
+    }
+
+    public void setLocation(String location) {
+        Location = location;
+    }
 
     public InventModel() {}
 

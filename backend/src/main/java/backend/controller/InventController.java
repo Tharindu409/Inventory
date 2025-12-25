@@ -3,18 +3,15 @@ package backend.controller;
 import backend.exception.InventoryNotFoundException;
 import backend.model.InventModel;
 import backend.repository.InventRepository;
-import jdk.jshell.spi.ExecutionControlProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import tools.jackson.databind.ObjectMapper;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.sql.SQLOutput;
 import java.util.List;
 
 @RestController
@@ -24,69 +21,60 @@ import java.util.List;
     @Autowired
     private InventRepository inventRepository;
 
-    @PostMapping("/inventory")
-    public InventModel newInventoryModel(@RequestBody InventModel newInventoryModel){
-        return inventRepository.save(newInventoryModel);
-    }
+    private final String UPLOAD_DIR = "E:/Download/spring/uploads/";
 
-    @PostMapping("/inventory/itemImg")
-    public String itemImage(@RequestParam("file") MultipartFile file) {
-        String folder = "E:/Download/spring/uploads/";
-        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename(); // avoid duplicates
-
-        try {
-            File dir = new File(folder);
-            if (!dir.exists()) dir.mkdirs();
-
-            file.transferTo(Paths.get(folder + fileName));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "error uploading file";
-        }
-
-        return fileName;
-    }
-
-
-
-
+    // 1. GET ALL ITEMS (For Home Page)
     @GetMapping("/inventory")
     public List<InventModel> getAllItems() {
         return inventRepository.findAll();
     }
 
-
-
+    // 2. GET SINGLE ITEM BY ID (Crucial for your "View Details" page)
     @GetMapping("/inventory/{id}")
-    InventModel getItemId(@PathVariable Long id){
-        return inventRepository.findById(id).orElseThrow(()-> new InventoryNotFoundException(id));
-
+    public InventModel getItemById(@PathVariable Long id) {
+        return inventRepository.findById(id)
+                .orElseThrow(() -> new InventoryNotFoundException(id));
     }
 
-    private final String UPLOAD_DIR = "E:/Download/spring/uploads/";
+    // 3. CREATE NEW ITEM
+    @PostMapping("/inventory")
+    public InventModel newInventoryModel(@RequestBody InventModel newInventoryModel) {
+        return inventRepository.save(newInventoryModel);
+    }
 
+    // 4. UPLOAD IMAGE
+    @PostMapping("/inventory/itemImg")
+    public String itemImage(@RequestParam("file") MultipartFile file) {
+        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+        try {
+            File dir = new File(UPLOAD_DIR);
+            if (!dir.exists()) dir.mkdirs();
+            file.transferTo(Paths.get(UPLOAD_DIR + fileName));
+        } catch (IOException e) {
+            return "error uploading file";
+        }
+        return fileName;
+    }
+
+    // 5. SERVE IMAGE TO FRONTEND
     @GetMapping("/uploads/{filename}")
-    public ResponseEntity<FileSystemResource> getImage(@PathVariable String filename){
-        File file = new File(UPLOAD_DIR+filename);
-
-        if(!file.exists()){
+    public ResponseEntity<FileSystemResource> getImage(@PathVariable String filename) {
+        File file = new File(UPLOAD_DIR + filename);
+        if (!file.exists()) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(new FileSystemResource(file));
-
     }
 
-
+    // 6. UPDATE ITEM
     @PutMapping(value = "/inventory/{id}", consumes = "multipart/form-data")
     public InventModel updateItem(
             @RequestPart("itemDetails") String itemDetails,
             @RequestPart(value = "file", required = false) MultipartFile file,
             @PathVariable Long id
     ) {
-
         ObjectMapper mapper = new ObjectMapper();
         InventModel newInventory;
-
         try {
             newInventory = mapper.readValue(itemDetails, InventModel.class);
         } catch (Exception e) {
@@ -94,63 +82,40 @@ import java.util.List;
         }
 
         return inventRepository.findById(id).map(existingInventory -> {
-
-            // ✅ CORRECT SETTERS
-            existingInventory.setItemId(newInventory.getItemId());
             existingInventory.setItemName(newInventory.getItemName());
             existingInventory.setItemCategory(newInventory.getItemCategory());
             existingInventory.setItemQty(newInventory.getItemQty());
             existingInventory.setItemDetails(newInventory.getItemDetails());
 
-            // ✅ IMAGE UPDATE (OPTIONAL)
             if (file != null && !file.isEmpty()) {
-                String uploadDir = "E:/Download/spring/uploads/";
-                String fileName = file.getOriginalFilename();
-
+                String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
                 try {
-                    File dir = new File(uploadDir);
-                    if (!dir.exists()) dir.mkdirs();
-
-                    file.transferTo(Paths.get(uploadDir + fileName));
+                    file.transferTo(Paths.get(UPLOAD_DIR + fileName));
                     existingInventory.setItemImage(fileName);
-
                 } catch (IOException e) {
-                    throw new RuntimeException("Error saving uploaded file", e);
+                    throw new RuntimeException("Error saving file", e);
                 }
             }
-
             return inventRepository.save(existingInventory);
-
         }).orElseThrow(() -> new InventoryNotFoundException(id));
-
-
-
     }
-    //delete part
+
+    // 7. DELETE ITEM
     @DeleteMapping("/inventory/{id}")
-    String deleteItem(@PathVariable Long id){
-        // check the items are exists in the db
-        InventModel inventItem = inventRepository.findById(id).orElseThrow(()->new InventoryNotFoundException(id));
+    public String deleteItem(@PathVariable Long id) {
+        InventModel inventItem = inventRepository.findById(id)
+                .orElseThrow(() -> new InventoryNotFoundException(id));
 
-        //image delete part
+        // Delete image file if exists
         String itemImage = inventItem.getItemImage();
-        if(itemImage!=null&&!itemImage.isEmpty()){
-            File imageFile = new File("E:/Download/spring/uploads/"+itemImage);
-            if(imageFile.exists()){
-                if(imageFile.delete()){
-                    System.out.println("image was deleted");
-                }else{
-                    System.out.println("image deletion was failed!!");
-
-                }
+        if (itemImage != null && !itemImage.isEmpty()) {
+            File imageFile = new File(UPLOAD_DIR + itemImage);
+            if (imageFile.exists()) {
+                imageFile.delete();
             }
-            //delete item from the repo
-            inventRepository.deleteById(id);
-            return "data with id "+id+ "and image deleted";
-
         }
-        return itemImage;
+
+        inventRepository.deleteById(id);
+        return "Item with ID " + id + " deleted successfully.";
     }
-
-
 }

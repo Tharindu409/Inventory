@@ -2,18 +2,26 @@ package backend.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
 public class UserModel {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Better for MySQL
     private Long id;
     private String fullName;
     private String email;
     private String password;
     private String phone;
 
+    // ============================================================
+    // 1. MANDATORY DEFAULT CONSTRUCTOR (Required by Hibernate/JPA)
+    // ============================================================
+    public UserModel() {
+    }
+
+    // 2. YOUR EXISTING CONSTRUCTOR
     public UserModel(Long id, String fullName, String email, String password, String phone) {
         this.id = id;
         this.fullName = fullName;
@@ -22,6 +30,7 @@ public class UserModel {
         this.phone = phone;
     }
 
+    // GETTERS AND SETTERS
     public Long getId() {
         return id;
     }

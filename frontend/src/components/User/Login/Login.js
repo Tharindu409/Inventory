@@ -3,7 +3,7 @@ import axios from "axios";
 import { HiEye, HiEyeOff } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 
-const Login = ({ onClose, onLoginSuccess }) => {
+const Login = ({ onClose }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -12,43 +12,43 @@ const Login = ({ onClose, onLoginSuccess }) => {
 
   const navigate = useNavigate();
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage("");
+ const onSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setMessage("");
 
-    try {
-      const response = await axios.post("http://localhost:8080/login", {
-        email,
-        password,
-      });
+  try {
+    // Ensure the URL is exactly this, and the data is the 2nd argument
+    const response = await axios.post("http://localhost:8080/login", {
+      email,    // This sends "email": "value"
+      password  // This sends "password": "value"
+    });
 
-      if (response.status === 200 && response.data.id) {
-        localStorage.setItem("userId", response.data.id);
-        setMessage("Login successful!");
-        
-        // Call parent function to update Navbar state
-        if (onLoginSuccess) onLoginSuccess();
-
-        setTimeout(() => {
-          if (onClose) onClose();
-          navigate("/home");
-        }, 800);
-      }
-    } catch (err) {
-      setMessage(
-        err.response?.data?.message || "Login failed. Please check credentials."
-      );
-    } finally {
-      setLoading(false);
+    console.log("Success:", response.data);
+    
+    if (response.data.id) {
+      localStorage.setItem("userId", response.data.id);
+      setMessage("Login successful!");
+      setTimeout(() => {
+        if (onClose) onClose();
+        navigate("/home");
+      }, 800);
     }
-  };
+  } catch (err) {
+// We changed Java to use lowercase "message"
+  const msg = err.response?.data?.message; 
+  setMessage(msg || "Login failed - check console");
+  console.log("Server response data:", err.response?.data);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <form
         onSubmit={onSubmit}
-        className="relative w-full max-w-sm rounded-2xl bg-white/90 dark:bg-slate-900/90 
+        className="relative w-full max-w-sm rounded-2xl bg-white/80 dark:bg-slate-900/80 
                    backdrop-blur-xl shadow-2xl p-6"
       >
         {/* Close */}
@@ -65,25 +65,23 @@ const Login = ({ onClose, onLoginSuccess }) => {
         </h2>
 
         {message && (
-          <p
-            className={`text-center text-sm mb-3 ${
-              message.includes("successful") ? "text-green-600" : "text-red-600"
-            }`}
-          >
+          <p className={`text-center text-sm mb-3 ${message.includes("successful") ? "text-green-600" : "text-red-600"}`}>
             {message}
           </p>
         )}
 
+        {/* Email */}
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="w-full mb-3 rounded-xl border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-white"
+          className="w-full rounded-xl border px-4 py-2 mb-3 focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-white"
         />
 
-        <div className="relative mb-3">
+        {/* Password */}
+        <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
             placeholder="Password"
@@ -103,7 +101,7 @@ const Login = ({ onClose, onLoginSuccess }) => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full mt-4 rounded-xl bg-green-600 py-2 text-white text-sm font-semibold hover:bg-green-700 transition disabled:opacity-50"
+          className="w-full mt-5 rounded-xl bg-green-600 py-2 text-white text-sm font-semibold hover:bg-green-700 transition disabled:opacity-50"
         >
           {loading ? "Logging in..." : "Login"}
         </button>

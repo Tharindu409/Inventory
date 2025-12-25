@@ -1,4 +1,4 @@
- import { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { HiEye, HiEyeOff } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
@@ -10,7 +10,7 @@ const Register = ({ onClose }) => {
     password: "",
     phone: "",
   });
-  const navigate1 = useNavigate();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState({ email: "", phone: "" });
@@ -40,28 +40,21 @@ const Register = ({ onClose }) => {
       await axios.post("http://localhost:8080/user", user);
       setMessage("Registered successfully!");
       setTimeout(() => {
-       if (onClose) onClose();
+        if (onClose) onClose();
       }, 1200);
-      navigate1("/home");
-      
-
-
+      navigate("/home");
     } catch {
       setMessage("Registration failed");
     }
   };
 
   return (
-    /* Overlay */
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      
-      {/* Modal */}
       <form
         onSubmit={onSubmit}
         className="relative w-full max-w-sm rounded-2xl bg-white/80 dark:bg-slate-900/80 
                    backdrop-blur-xl shadow-2xl p-6"
       >
-        {/* Close */}
         <button
           type="button"
           onClick={onClose}
@@ -75,23 +68,19 @@ const Register = ({ onClose }) => {
         </h2>
 
         {message && (
-          <p className="text-center text-green-600 text-sm mb-3">
-            {message}
-          </p>
+          <p className="text-center text-green-600 text-sm mb-3">{message}</p>
         )}
 
-        {/* Full Name */}
         <input
           type="text"
           name="fullName"
-          placeholder="Full name"
+          placeholder="Full Name"
           value={fullName}
           onChange={onInputChange}
           required
           className="input"
         />
 
-        {/* Email */}
         <input
           type="email"
           name="email"
@@ -103,7 +92,6 @@ const Register = ({ onClose }) => {
         />
         {errors.email && <p className="error">{errors.email}</p>}
 
-        {/* Password */}
         <div className="relative mt-3">
           <input
             type={showPassword ? "text" : "password"}
@@ -122,11 +110,10 @@ const Register = ({ onClose }) => {
           </span>
         </div>
 
-        {/* Phone */}
         <input
           type="text"
           name="phone"
-          placeholder="Phone number"
+          placeholder="Phone Number"
           value={phone}
           onChange={onInputChange}
           required
@@ -136,8 +123,7 @@ const Register = ({ onClose }) => {
 
         <button
           type="submit"
-          className="w-full mt-5 rounded-xl bg-green-600 py-2 text-white text-sm font-semibold
-                     hover:bg-green-700 transition"
+          className="w-full mt-5 rounded-xl bg-green-600 py-2 text-white text-sm font-semibold hover:bg-green-700 transition"
         >
           Sign Up
         </button>
