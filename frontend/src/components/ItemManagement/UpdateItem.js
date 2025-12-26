@@ -43,36 +43,35 @@ const UpdateItem = ({ itemId, onUpdated }) => {
     e.preventDefault();
 
     const data = new FormData();
-    // Prepare the JSON object to match your Spring Boot InventModel
-    data.append(
-      "itemDetails",
-      JSON.stringify({
-        itemName: formData.itemName,
-        itemCategory: formData.itemCategory,
-        itemQty: formData.itemQty,
-        itemDetails: formData.itemDetails,
-        itemPrice: parseFloat(formData.itemPrice),      // New Field
-        minStockLimit: parseInt(formData.minStockLimit), // New Field
-        location: formData.location                      // New Field
-      })
-    );
+    
+    // Create the object
+    const itemObject = {
+      itemName: formData.itemName,
+      itemCategory: formData.itemCategory,
+      itemQty: formData.itemQty,
+      itemDetails: formData.itemDetails,
+      itemPrice: formData.itemPrice ? parseFloat(formData.itemPrice) : 0,
+      minStockLimit: formData.minStockLimit ? parseInt(formData.minStockLimit) : 0,
+      location: formData.location
+    };
+
+    // Append as a simple String because your Java code uses String itemDetails
+    data.append("itemDetails", JSON.stringify(itemObject));
 
     if (formData.itemImage) {
       data.append("file", formData.itemImage);
     }
 
     try {
-      await axios.put(
-        `http://localhost:8080/inventory/${itemId}`,
-        data,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
+      await axios.put(`http://localhost:8080/inventory/${itemId}`, data, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
 
       alert("Item updated successfully");
       onUpdated();
     } catch (err) {
       console.error("Update failed", err);
-      alert("Failed to update item");
+      alert("Update failed. Check if all fields are filled correctly.");
     }
   };
 

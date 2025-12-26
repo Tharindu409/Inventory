@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -50,7 +51,32 @@ public class UserController {
                     .body(Map.of("message", "invalid credentials")); // Return 2: Failure
         }
     }
+    //desplay
+    @GetMapping("/user")
+    List<UserModel> getAllUsers(){
+        return userRepository.findAll();
+    }
+    @GetMapping("/user/{id}")
+    UserModel getUserId(@PathVariable Long id){
+        return userRepository.findById(id)
+                .orElseThrow(()->new UserNotFoundException(id));
 
 
+    }
+
+   //update
+   @PutMapping("/user/{id}")
+   UserModel updateProfile(@RequestBody UserModel newUserModel, @PathVariable Long id){
+        return userRepository.findById(id)
+                .map(userModel -> {
+                    if (newUserModel.getFullName()!=null) userModel.setFullName(newUserModel.getFullName());
+                    if (newUserModel.getEmail()!=null) userModel.setEmail(newUserModel.getEmail());
+                    if (newUserModel.getPassword()!=null) userModel.setPassword(newUserModel.getPassword());
+                    if (newUserModel.getPhone()!=null) userModel.setPhone(newUserModel.getPhone());
+
+                    return userRepository.save(userModel);
+                }).orElseThrow(()->new UserNotFoundException(id));
+
+   }
 
 }

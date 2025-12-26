@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FaImage, FaTag, FaBox, FaList, FaDollarSign, FaExclamationTriangle, FaMapMarkerAlt } from "react-icons/fa";
 
+
 const AddItem = () => {
   const navigate = useNavigate();
 

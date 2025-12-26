@@ -10,6 +10,9 @@ import LandingPage from "./components/User/LandingPage";
 import Login from "./components/User/Login/Login";
 import ItemDetails from "./components/ItemDetails/ItemDetails";
 import Cart from "./components/ItemDetails/Cart";
+import UserProfile from "./components/User/UserProfile/UserProfile";
+import UpdateProfile from "./components/User/UserProfile/UpdateProfile";
+  
 
 function App() {
   return (
@@ -25,7 +28,7 @@ function App() {
       <Route path="/home" element={<Home />} />
       <Route path="/updateitem/:id" element={<UpdateItem />} />
        <Route path="/additem" element={<AddItem />} />
-
+ 
        {/* User Registration and login */}
 
        <Route path="/register" element={<Register />} />
@@ -33,6 +36,9 @@ function App() {
       <Route path="/item/:id" element={<ItemDetails />} />
 
       <Route path="/order" element={<Cart/>}/>
+      <Route path="/profile" element={<UserProfile />} />
+      <Route path="/updateProfile" element={<UpdateProfile id={localStorage.getItem('userId')} />} />
+        
       
     </Routes>
     <Footer/>

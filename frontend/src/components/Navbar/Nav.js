@@ -1,39 +1,42 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom"; // Added useLocation
+import { useNavigate, useLocation } from "react-router-dom";
 import { HiMenu, HiX } from "react-icons/hi";
-import { FaBoxOpen, FaUserCircle } from "react-icons/fa"; // Added User Icon
+import { FaBoxOpen, FaUserCircle, FaSignOutAlt } from "react-icons/fa"; 
 import { motion, AnimatePresence } from "framer-motion";
 import Register from "../../components/User/Register/Register";
 import Login from "../../components/User/Login/Login";
- 
+
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [dark, setDark] = useState(false);
   const [modal, setModal] = useState(null);
+
+  
+  // Track state for reactivity
   const [userId, setUserId] = useState(localStorage.getItem("userId"));
+  const [fullName, setFullName] = useState(localStorage.getItem("fullName"));
 
-  // This ensures the navbar updates immediately when localStorage changes
   useEffect(() => {
-    const checkUser = () => {
+    const syncUser = () => {
       setUserId(localStorage.getItem("userId"));
+      setFullName(localStorage.getItem("fullName"));
     };
-    window.addEventListener("storage", checkUser); // Listen for changes in other tabs
-    return () => window.removeEventListener("storage", checkUser);
-  }, []);
-
-  // Update userId whenever the route changes (helps after login redirect)
-  useEffect(() => {
-    setUserId(localStorage.getItem("userId"));
+    
+    
+    syncUser(); // Run on location change
+    window.addEventListener("storage", syncUser); 
+    return () => window.removeEventListener("storage", syncUser);
   }, [location]);
 
   const handleLogout = () => {
     localStorage.removeItem("userId");
-    localStorage.removeItem("userName"); // Clean up name too
+    localStorage.removeItem("fullName");
     setUserId(null);
+    setFullName(null);
     setMenuOpen(false);
-    navigate("/"); // Redirect to landing page
+    navigate("/");
   };
 
   const links = [
@@ -45,26 +48,25 @@ const Navbar = () => {
 
   return (
     <div className={dark ? "dark" : ""}>
-      <nav className="sticky top-0 z-50 bg-green-700 dark:bg-slate-900/80 backdrop-blur border-b border-black/10 dark:border-slate-800">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <nav className="sticky top-0 z-50 bg-green-700 dark:bg-slate-900 backdrop-blur border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
           
           {/* Logo */}
           <h1
             onClick={() => navigate("/")}
-            className="flex items-center gap-2 text-2xl font-bold cursor-pointer text-white"
+            className="flex items-center gap-2 text-2xl font-black cursor-pointer text-white tracking-tighter"
           >
-            <FaBoxOpen className="text-yellow-400" /> Area52
+            <FaBoxOpen className="text-yellow-400" /> AREA52
           </h1>
 
           {/* Desktop Menu */}
-          <ul className="hidden md:flex gap-8 text-sm font-medium text-white">
+          <ul className="hidden md:flex gap-8 text-sm font-bold text-white/80">
             {links.map(({ name, path, protected: isProtected }) => (
-              // Only show protected links if userId exists
               (!isProtected || userId) && (
                 <li
                   key={name}
                   onClick={() => navigate(path)}
-                  className={`cursor-pointer hover:text-green-200 transition-colors ${
+                  className={`cursor-pointer hover:text-white transition-all ${
                     location.pathname === path ? "text-yellow-400 border-b-2 border-yellow-400" : ""
                   }`}
                 >
@@ -74,78 +76,97 @@ const Navbar = () => {
             ))}
           </ul>
 
-          {/* Desktop Buttons */}
-          <div className="hidden md:flex gap-4 items-center text-white">
+          {/* Desktop User Section */}
+          <div className="hidden md:flex gap-4 items-center">
             {userId ? (
               <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2 bg-green-800 px-3 py-1 rounded-lg">
-                  <FaUserCircle />
-                  <span className="text-xs">User Active</span>
-                </div>
-                <button 
-                  onClick={handleLogout}
-                  className="hover:text-red-300 font-semibold transition"
+                {/* User Profile Badge */}
+                <div 
+                  onClick={() => navigate("/profile")}
+                  className="group flex items-center gap-3 cursor-pointer bg-white/10 hover:bg-white/20 px-4 py-1 
+                  rounded-full transition-all border border-white/20 shadow-inner"
                 >
-                  Logout
+                  <div className="flex flex-col items-end -space-y-1">
+                    <span className="text-[9px] uppercase tracking-tighter text-green-300 font-black">Active User</span>
+                    <span className="text-sm font-bold text-white">
+                      {fullName ? fullName.split(" ")[0] : "Agent"}
+                    </span>
+                  </div>
+                  <div className="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-green-800 group-hover:rotate-12 
+                  transition-transform shadow-lg">
+                    <FaUserCircle size={20} />
+                  </div>
+                </div>
+
+                {/* Logout Button */}
+                <button
+                  onClick={handleLogout}
+                  className="p-2 text-white/60 hover:text-red-400 transition-colors"
+                  title="Logout"
+                >
+                  <FaSignOutAlt size={20} />
                 </button>
               </div>
             ) : (
-              <>
-                <button className="hover:text-green-200 transition" onClick={() => setModal("login")}>Login</button>
+              <div className="flex items-center gap-4">
+                <button className="text-sm font-bold text-white hover:text-yellow-400 transition" onClick={() => setModal("login")}>
+                  LOGIN 
+                </button>
+
                 <button
                   onClick={() => setModal("signup")}
-                  className="bg-white text-green-700 px-5 py-2 rounded-full font-bold hover:bg-green-50 transition shadow-lg"
+                  className="bg-white text-green-700 px-6 py-2 rounded-full text-sm font-black hover:bg-yellow-400 hover:text-green-900 transition-all shadow-xl"
                 >
-                  Sign Up
+                  JOIN
                 </button>
-              </>
+              </div>
             )}
             
             <button
               onClick={() => setDark(!dark)}
-              className="ml-2 p-2 rounded-full border border-white/30 hover:bg-white/10 transition"
+              className="p-2 rounded-full bg-black/20 text-white hover:bg-black/40 transition"
             >
               {dark ? "🌙" : "☀️"}
             </button>
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden text-3xl text-white"
-          >
+          {/* Mobile Menu Toggle */}
+          <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden text-3xl text-white">
             {menuOpen ? <HiX /> : <HiMenu />}
           </button>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Menu Content */}
         <AnimatePresence>
           {menuOpen && (
             <motion.div
-              className="md:hidden bg-green-800 dark:bg-slate-900 px-6 pb-8 space-y-4 text-white border-t border-green-600"
+              className="md:hidden bg-green-800 dark:bg-slate-900 px-6 pb-8 space-y-4 text-white border-t border-white/10"
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
+
             >
+              {/* User Info for Mobile */}
+              {userId && (
+                <div className="py-4 border-b border-white/10 flex items-center gap-3 text-yellow-400 font-bold">
+                  <FaUserCircle size={24} /> { fullName ? fullName : "Agent"}
+                </div>
+              )}
               {links.map(({ name, path, protected: isProtected }) => (
                 (!isProtected || userId) && (
-                  <button 
-                    key={name} 
-                    className="block w-full text-left py-2 border-b border-green-700" 
-                    onClick={() => { navigate(path); setMenuOpen(false); }}
-                  >
+                  <button key={name} className="block w-full text-left py-2 font-medium" onClick={() => { navigate(path); setMenuOpen(false); }}>
                     {name}
                   </button>
                 )
               ))}
-              <div className="pt-4 flex flex-col gap-4">
+              <div className="pt-4">
                 {userId ? (
-                  <button className="text-left text-red-300 font-bold" onClick={handleLogout}>Logout</button>
+                  <button className="w-full bg-red-600 py-3 rounded-xl font-bold" onClick={handleLogout}>Logout</button>
                 ) : (
-                  <>
-                    <button className="text-left" onClick={() => {setModal("login"); setMenuOpen(false)}}>Login</button>
-                    <button className="bg-white text-green-700 px-4 py-2 rounded-lg font-bold" onClick={() => {setModal("signup"); setMenuOpen(false)}}>Sign Up</button>
-                  </>
+                  <div className="flex gap-2">
+                    <button className="flex-1 bg-white/10 py-3 rounded-xl" onClick={() => setModal("login")}>Login</button>
+                    <button className="flex-1 bg-white text-green-700 py-3 rounded-xl font-bold" onClick={() => setModal("signup")}>Sign Up</button>
+                  </div>
                 )}
               </div>
             </motion.div>
@@ -153,21 +174,21 @@ const Navbar = () => {
         </AnimatePresence>
       </nav>
 
-      {/* Modals */}
+      {/* Modals for Login/Register */}
       <AnimatePresence>
         {modal && (
           <motion.div
-            className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+            className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setModal(null)}
           >
             <motion.div
-              className="w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-2xl"
-              initial={{ y: 50, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 50, opacity: 0 }}
+              className="w-full max-w-md bg-white dark:bg-slate-800 rounded-3xl overflow-hidden shadow-2xl"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
             >
               {modal === "signup" ? (
@@ -175,8 +196,9 @@ const Navbar = () => {
               ) : (
                 <Login onClose={() => {
                   setModal(null);
-                  setUserId(localStorage.getItem("userId")); // Sync after login
-                }} />
+                  setUserId(localStorage.getItem("userId"));
+                  setFullName(localStorage.getItem("fullName"));
+                 }} />
               )}
             </motion.div>
           </motion.div>

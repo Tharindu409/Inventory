@@ -56,7 +56,7 @@ import java.util.List;
         return fileName;
     }
 
-    // 5. SERVE IMAGE TO FRONTEND
+    //  IMAGE TO FRONTEND
     @GetMapping("/uploads/{filename}")
     public ResponseEntity<FileSystemResource> getImage(@PathVariable String filename) {
         File file = new File(UPLOAD_DIR + filename);
@@ -66,7 +66,8 @@ import java.util.List;
         return ResponseEntity.ok(new FileSystemResource(file));
     }
 
-    // 6. UPDATE ITEM
+    //update
+
     @PutMapping(value = "/inventory/{id}", consumes = "multipart/form-data")
     public InventModel updateItem(
             @RequestPart("itemDetails") String itemDetails,
@@ -86,6 +87,11 @@ import java.util.List;
             existingInventory.setItemCategory(newInventory.getItemCategory());
             existingInventory.setItemQty(newInventory.getItemQty());
             existingInventory.setItemDetails(newInventory.getItemDetails());
+
+            // ADD THESE NEW FIELDS TO YOUR REPOSITORY SAVE LOGIC
+            existingInventory.setItemPrice(newInventory.getItemPrice());
+            existingInventory.setMinStockLimit(newInventory.getMinStockLimit());
+            existingInventory.setLocation(newInventory.getLocation());
 
             if (file != null && !file.isEmpty()) {
                 String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
