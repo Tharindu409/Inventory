@@ -14,6 +14,15 @@ public class UserModel {
     private String email;
     private String password;
     private String phone;
+    private String role;
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
 
     // ============================================================
     // 1. MANDATORY DEFAULT CONSTRUCTOR (Required by Hibernate/JPA)

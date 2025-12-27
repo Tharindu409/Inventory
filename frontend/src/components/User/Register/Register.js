@@ -35,18 +35,32 @@ const Register = ({ onClose }) => {
   };
 
   const onSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post("http://localhost:8080/user", user);
+  e.preventDefault();
+  try {
+    const response = await axios.post("http://localhost:8080/user", user);
+    
+    // IMPORTANT: Save data to localStorage so Navbar sees you are logged in
+    if (response.data.id) {
+      localStorage.setItem("userId", response.data.id);
+      localStorage.setItem("fullName", response.data.fullName);
+      localStorage.setItem("userRole", response.data.role);
+      window.dispatchEvent(new Event("storage")); 
+      navigate('/home');
+      
       setMessage("Registered successfully!");
+
+      // Small delay to show the success message before moving
       setTimeout(() => {
         if (onClose) onClose();
-      }, 1200);
-      navigate("/home");
-    } catch {
-      setMessage("Registration failed");
+        navigate("/home"); // Move to home page
+        window.dispatchEvent(new Event("storage")); // Force Navbar to update
+      }, 1000);
     }
-  };
+  } catch (error) {
+    const errorMsg = error.response?.data?.message || "Registration failed";
+    setMessage(`Error: ${errorMsg}`);
+  }
+};
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">

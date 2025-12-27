@@ -12,22 +12,24 @@ const Login = ({ onClose }) => {
 
   const navigate = useNavigate();
 
- const onSubmit = async (e) => {
+const onSubmit = async (e) => {
   e.preventDefault();
   setLoading(true);
   setMessage("");
 
   try {
-    // Ensure the URL is exactly this, and the data is the 2nd argument
     const response = await axios.post("http://localhost:8080/login", {
-      email,    // This sends "email": "value"
-      password  // This sends "password": "value"
+      email,
+      password 
     });
 
-    console.log("Success:", response.data);
-    
     if (response.data.id) {
       localStorage.setItem("userId", response.data.id);
+      localStorage.setItem("fullName", response.data.fullName || "Agent");
+      localStorage.setItem("userRole", response.data.role  );
+      window.dispatchEvent(new Event("storage")); // Notify other components of storage change
+      navigate('/home')
+      
       setMessage("Login successful!");
       setTimeout(() => {
         if (onClose) onClose();
@@ -35,10 +37,9 @@ const Login = ({ onClose }) => {
       }, 800);
     }
   } catch (err) {
-// We changed Java to use lowercase "message"
-  const msg = err.response?.data?.message; 
-  setMessage(msg || "Login failed - check console");
-  console.log("Server response data:", err.response?.data);
+    // Correctly accessing the error message from the backend map
+    const errorMsg = err.response?.data?.message || "Login failed";
+    setMessage(errorMsg);
   } finally {
     setLoading(false);
   }

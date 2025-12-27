@@ -23,9 +23,9 @@ const Hero = () => {
           variants={SlideRight(0.2)}
           initial="hidden"
           animate="visible"
-          className="text-orange-500 uppercase tracking-wide font-semibold text-lg"
+          className="text-red-500 uppercase tracking-wide font-semibold text-lg"
         >
-          100% Satisfaction Guaranteed
+          Inventory Management Made Easy
         </motion.p>
 
         <motion.h1
@@ -34,7 +34,7 @@ const Hero = () => {
           animate="visible"
           className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight"
         >
-          Welcome to <span className="text-green-500">InventorySys</span>
+          Welcome to <span className="text-green-500">Area52</span>
         </motion.h1>
 
         <motion.p

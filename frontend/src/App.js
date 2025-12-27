@@ -1,4 +1,4 @@
- import { Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Home from "./components/Home/Home";
 import AddItem from "./components/AddItem/AddItem";
 import AdminDashBoard from "./components/Admin/AdminDashboard";
@@ -12,36 +12,49 @@ import ItemDetails from "./components/ItemDetails/ItemDetails";
 import Cart from "./components/ItemDetails/Cart";
 import UserProfile from "./components/User/UserProfile/UserProfile";
 import UpdateProfile from "./components/User/UserProfile/UpdateProfile";
-  
 
+const AdminRoute = ({ children }) => {
+  const userRole = localStorage.getItem("userRole");
+  
+  if (userRole !== "ADMIN") {
+    // If not admin, redirect to home or show an error
+    return <Home />;
+  }
+  
+  return children;
+};  
 function App() {
   return (
-    
     <>
-    <Navbar />
-    <Routes>
-       <Route path="/AdminDashBoard" element={<AdminDashBoard/>}/>
-      
-      <Route path="/" element={
-        <LandingPage />}
-      />
-      <Route path="/home" element={<Home />} />
-      <Route path="/updateitem/:id" element={<UpdateItem />} />
-       <Route path="/additem" element={<AddItem />} />
- 
-       {/* User Registration and login */}
-
-       <Route path="/register" element={<Register />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/item/:id" element={<ItemDetails />} />
-
-      <Route path="/order" element={<Cart/>}/>
-      <Route path="/profile" element={<UserProfile />} />
-      <Route path="/updateProfile" element={<UpdateProfile id={localStorage.getItem('userId')} />} />
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/home" element={<Home />} />
         
-      
-    </Routes>
-    <Footer/>
+        <Route
+          path="/AdminDashboard"
+          element={
+            <AdminRoute>
+              <AdminDashBoard />
+            </AdminRoute>
+          }
+        />
+        <Route path="/additem" element={<AddItem />} />
+        <Route path="/updateitem/:id" element={<UpdateItem />} />
+        <Route path="/item/:id" element={<ItemDetails />} />
+
+        {/* User Authentication & Profile */}
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+        
+        <Route path="/update-profile/:id" element={<UpdateProfile />} />
+        {/* URL Param :id is essential here for UpdateProfile to work */}
+        <Route path="/profile" element={<UserProfile />} /> 
+        
+        {/* Shopping */}
+        <Route path="/order" element={<Cart/>}/>
+      </Routes>
+      <Footer/>
     </>
   );
 }
