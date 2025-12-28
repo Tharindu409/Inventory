@@ -6,7 +6,7 @@ const Footer = () => {
     <footer className="bg-green-700 text-white mt-32">
       <div className="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-3 gap-8">
         <div>
-          <h2 className="text-xl font-semibold mb-2">Area</h2>
+          <h2 className="text-xl font-semibold mb-2">Area52</h2>
           <p className="text-sm opacity-90">
             Smart inventory management system designed for efficiency and
             simplicity.

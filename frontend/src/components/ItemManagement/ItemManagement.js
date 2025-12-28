@@ -24,11 +24,20 @@ const ItemManagement = () => {
     }
   };
 
-  const deleteItem = async (id) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this item?");
+  const deleteItem = async (id, itemName) => { // Added itemName as parameter
+    const confirmDelete = window.confirm(`Are you sure you want to delete ${itemName}?`);
     if (confirmDelete) {
       try {
+        // 1. Delete the item
         await axios.delete(`http://localhost:8080/inventory/${id}`);
+        
+        // 2. LOG THE ACTION (New Code)
+        await axios.post("http://localhost:8080/log", {
+          action: "DELETE_ITEM",
+          performedBy: "Admin", // You can change this to a dynamic name later
+          details: `Removed item: ${itemName} (ID: ${id}) from inventory.`
+        });
+
         loadItems();
       } catch (error) {
         console.error("Failed to delete item", error);

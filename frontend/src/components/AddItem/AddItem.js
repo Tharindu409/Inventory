@@ -13,9 +13,9 @@ const AddItem = () => {
     itemCategory: "",
     itemQty: "",
     itemDetails: "",
-    itemPrice: "",       // New Field
-    minStockLimit: "",   // New Field
-    location: ""         // New Field
+    itemPrice: "",        
+    minStockLimit: "",   
+    location: ""         
   });
 
   const onInputChange = (e) => {
@@ -52,8 +52,7 @@ const AddItem = () => {
       return;
     }
 
-    // 2️⃣ Save item (Mapping to your updated InventModel)
-    const updatedInventory = {
+     const updatedInventory = {
       itemName: inventory.itemName,
       itemCategory: inventory.itemCategory,
       itemQty: inventory.itemQty,
