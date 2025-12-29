@@ -1,43 +1,19 @@
-# 📦 Inventory & Support System
-
-A Full-Stack application for managing warehouse inventory and customer support inquiries. Built using **Spring Boot** (Backend) and **React** (Frontend).
-
-## 🚀 Key Features
-- **Inventory Management:** Full CRUD operations for products with image uploads.
-- **Stock Alerts:** Automatically tracks low stock levels based on limits.
-- **Customer Support:** Integrated "Contact Us" form that saves messages to a database.
-- **Admin Inbox:** Specialized dashboard to view, mark as read, or delete messages.
-- **Secure Auth:** Password reset functionality via real email (SMTP).
-- **Activity Logs:** Tracks all admin actions for accountability.
-
-## 🛠️ Tech Stack
-- **Frontend:** React.js, Tailwind CSS, Axios
-- **Backend:** Spring Boot, Spring Data JPA, Java Mail API
-- **Database:** MySQL
-
-## ⚙️ Quick Start
-
-### 1. Database Setup
-Create a MySQL database and update `backend/src/main/resources/application.properties`:
-```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/your_db_name
+📦 Smart Inventory & Support SystemA robust Full-Stack solution for modern warehouse management and streamlined customer communication. This project bridges the gap between inventory control and real-time support.🌟 Key Features🛠 Inventory ManagementDynamic CRUD: Manage products with real-time updates.Media Support: Multipart image uploads with live frontend previews.Smart Alerts: Automated low-stock visual indicators based on custom limits.Batch Actions: Global price adjustment tools for administrative efficiency.📩 Support EcosystemCustomer Portal: Integrated contact forms with automated database persistence.Admin Command Center: A dedicated inbox to read, archive, or delete inquiries.Tracking: "Read/Unread" status toggles for organized workflow.🔒 Security & ReliabilitySMTP Integration: Secure password recovery using JavaMailSender.Audit Trails: Detailed activity logs tracking every administrative change.🛠️ Tech StackLayerTechnologyFrontendReact.js, Tailwind CSS, Axios, React-IconsBackendSpring Boot 3, Spring Data JPA, HibernateSecurityJava Mail API (SMTP), UUID TokensDatabaseMySQL 8.0📂 Project StructurePlaintext├── backend/            # Spring Boot REST API
+│   ├── src/main/java/  # Controllers, Models, Repositories, Services
+│   ├── uploads/        # Local storage for product images
+│   └── pom.xml         # Maven configuration
+└── frontend/           # React.js SPA
+    ├── src/components/ # Reusable UI elements
+    ├── src/pages/      # Inventory & Admin Dashboard views
+    └── package.json    # Node dependencies
+⚙️ Setup & Installation1. Database ConfigurationCreate a MySQL schema named inventory_db.Update backend/src/main/resources/application.properties:Propertiesspring.datasource.url=jdbc:mysql://localhost:3306/inventory_db
 spring.datasource.username=your_username
 spring.datasource.password=your_password
-2. Run Backend
-Bash
-
-cd backend
+# Ensure this is set to update for first run
+spring.jpa.hibernate.ddl-auto=update
+2. ExecutionRun Backend:Bashcd backend
 ./mvnw spring-boot:run
-3. Run Frontend
-Bash
-
-cd frontend
+Run Frontend:Bashcd frontend
 npm install
 npm start
-📂 Project Structure
-backend/ - Spring Boot source code and API logic.
-
-frontend/ - React components and user interface.
-
-uploads/ - Directory for stored inventory images.
-
+👤 AuthorTharindu * GitHub: @your-usernameRole: Full-Stack Developer
