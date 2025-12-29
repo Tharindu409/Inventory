@@ -17,17 +17,27 @@ public class InventModel {
     private String itemCategory;
     private String itemQty;
     private String itemDetails;
-    private Double ItemPrice;
+    private Double itemPrice;
     private Integer minStockLimit;
-    private String Location;
+    private String location;
 
     public Double getItemPrice() {
-        return ItemPrice;
+        return itemPrice;
     }
 
     public void setItemPrice(Double itemPrice) {
-        ItemPrice = itemPrice;
+        this.itemPrice = itemPrice;
     }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+
 
     public Integer getMinStockLimit() {
         return minStockLimit;
@@ -37,13 +47,7 @@ public class InventModel {
         this.minStockLimit = minStockLimit;
     }
 
-    public String getLocation() {
-        return Location;
-    }
 
-    public void setLocation(String location) {
-        Location = location;
-    }
 
     public InventModel() {}
 
