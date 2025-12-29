@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { HiEye, HiEyeOff } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
@@ -10,136 +10,164 @@ const Register = ({ onClose }) => {
     password: "",
     phone: "",
   });
+  
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({ email: "", phone: "" });
 
   const { fullName, email, password, phone } = user;
 
-  const validateEmail = (email) =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-  const validatePhone = (phone) =>
-    /^[0-9]{10}$/.test(phone);
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validatePhone = (phone) => /^[0-9]{10}$/.test(phone);
 
   const onInputChange = (e) => {
     const { name, value } = e.target;
     setUser({ ...user, [name]: value });
 
-    if (name === "email")
-      setErrors({ ...errors, email: validateEmail(value) ? "" : "Invalid email" });
-
-    if (name === "phone")
-      setErrors({ ...errors, phone: validatePhone(value) ? "" : "10 digits only" });
+    if (name === "email") {
+      setErrors((prev) => ({ ...prev, email: validateEmail(value) ? "" : "Invalid email format" }));
+    }
+    if (name === "phone") {
+      setErrors((prev) => ({ ...prev, phone: validatePhone(value) ? "" : "Must be 10 digits" }));
+    }
   };
 
   const onSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const response = await axios.post("http://localhost:8080/user", user);
-    
-    // IMPORTANT: Save data to localStorage so Navbar sees you are logged in
-    if (response.data.id) {
-      localStorage.setItem("userId", response.data.id);
-      localStorage.setItem("fullName", response.data.fullName);
-      localStorage.setItem("userRole", response.data.role);
-      window.dispatchEvent(new Event("storage")); 
-      navigate('/home');
-      
-      setMessage("Registered successfully!");
+    e.preventDefault();
+    if (errors.email || errors.phone) return;
+    setLoading(true);
 
-      // Small delay to show the success message before moving
-      setTimeout(() => {
-        if (onClose) onClose();
-        navigate("/home"); // Move to home page
-        window.dispatchEvent(new Event("storage")); // Force Navbar to update
-      }, 1000);
+    try {
+      // 1. Create the user
+      const response = await axios.post("http://localhost:8080/user", user);
+
+      // 2. Logging (Defensive - won't break registration if log fails)
+      try {
+        await axios.post("http://localhost:8080/log", {
+          action: "REGISTER_USER",
+          performedBy: user.fullName,
+          details: `New user registered: ${user.fullName} (${user.email})`
+        });
+      } catch (logErr) {
+        console.warn("Audit log failed, but registration continued.");
+      }
+
+      if (response.data.id) {
+        // 3. Auto-Login: Save to localStorage
+        localStorage.setItem("userId", response.data.id);
+        localStorage.setItem("fullName", response.data.fullName);
+        localStorage.setItem("userRole", response.data.role || "USER");
+        localStorage.setItem("isLoggedIn", "true");
+
+        // 4. Update UI state across the app
+        window.dispatchEvent(new Event("storage")); 
+        setMessage("Registration successful!");
+
+        setTimeout(() => {
+          if (onClose) onClose();
+          navigate('/home');
+        }, 1500);
+      }
+    } catch (error) {
+      const errorMsg = error.response?.data?.message || "Registration failed. Email might already exist.";
+      setMessage(`Error: ${errorMsg}`);
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    const errorMsg = error.response?.data?.message || "Registration failed";
-    setMessage(`Error: ${errorMsg}`);
-  }
-};
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
       <form
         onSubmit={onSubmit}
-        className="relative w-full max-w-sm rounded-2xl bg-white/80 dark:bg-slate-900/80 
-                   backdrop-blur-xl shadow-2xl p-6"
+        className="relative w-full max-w-sm rounded-3xl bg-white dark:bg-slate-900 shadow-2xl p-8 border border-gray-100"
       >
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
+          className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition"
         >
           ✕
         </button>
 
-        <h2 className="text-xl font-semibold text-center text-gray-800 dark:text-white mb-4">
+        <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-white mb-2">
           Create Account
         </h2>
+        <p className="text-center text-sm text-gray-500 mb-6">Join our inventory system</p>
 
         {message && (
-          <p className="text-center text-green-600 text-sm mb-3">{message}</p>
+          <div className={`p-3 rounded-lg text-center text-xs font-bold mb-4 ${
+            message.includes("successful") ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+          }`}>
+            {message}
+          </div>
         )}
 
-        <input
-          type="text"
-          name="fullName"
-          placeholder="Full Name"
-          value={fullName}
-          onChange={onInputChange}
-          required
-          className="input"
-        />
-
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={email}
-          onChange={onInputChange}
-          required
-          className="input mt-3"
-        />
-        {errors.email && <p className="error">{errors.email}</p>}
-
-        <div className="relative mt-3">
+        <div className="space-y-4">
           <input
-            type={showPassword ? "text" : "password"}
-            name="password"
-            placeholder="Password"
-            value={password}
+            type="text"
+            name="fullName"
+            placeholder="Full Name"
+            value={fullName}
             onChange={onInputChange}
             required
-            className="input pr-10"
+            className="w-full rounded-xl border border-gray-200 px-4 py-3 focus:ring-2 focus:ring-green-500 outline-none dark:bg-slate-800 dark:text-white"
           />
-          <span
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-3 cursor-pointer text-gray-400"
-          >
-            {showPassword ? <HiEyeOff /> : <HiEye />}
-          </span>
-        </div>
 
-        <input
-          type="text"
-          name="phone"
-          placeholder="Phone Number"
-          value={phone}
-          onChange={onInputChange}
-          required
-          className="input mt-3"
-        />
-        {errors.phone && <p className="error">{errors.phone}</p>}
+          <div>
+            <input
+              type="email"
+              name="email"
+              placeholder="Email Address"
+              value={email}
+              onChange={onInputChange}
+              required
+              className={`w-full rounded-xl border px-4 py-3 focus:ring-2 focus:ring-green-500 outline-none dark:bg-slate-800 dark:text-white ${errors.email ? 'border-red-500' : 'border-gray-200'}`}
+            />
+            {errors.email && <p className="text-[10px] text-red-500 mt-1 ml-1 font-bold">{errors.email}</p>}
+          </div>
+
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Password"
+              value={password}
+              onChange={onInputChange}
+              required
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 pr-12 focus:ring-2 focus:ring-green-500 outline-none dark:bg-slate-800 dark:text-white"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
+            >
+              {showPassword ? <HiEyeOff size={20} /> : <HiEye size={20} />}
+            </button>
+          </div>
+
+          <div>
+            <input
+              type="text"
+              name="phone"
+              placeholder="Phone Number (10 digits)"
+              value={phone}
+              onChange={onInputChange}
+              required
+              className={`w-full rounded-xl border px-4 py-3 focus:ring-2 focus:ring-green-500 outline-none dark:bg-slate-800 dark:text-white ${errors.phone ? 'border-red-500' : 'border-gray-200'}`}
+            />
+            {errors.phone && <p className="text-[10px] text-red-500 mt-1 ml-1 font-bold">{errors.phone}</p>}
+          </div>
+        </div>
 
         <button
           type="submit"
-          className="w-full mt-5 rounded-xl bg-green-600 py-2 text-white text-sm font-semibold hover:bg-green-700 transition"
+          disabled={loading}
+          className="w-full mt-8 rounded-xl bg-slate-900 py-3 text-white font-bold hover:bg-green-600 transition-all shadow-lg active:scale-95 disabled:opacity-50"
         >
-          Sign Up
+          {loading ? "Creating Account..." : "Sign Up"}
         </button>
       </form>
     </div>

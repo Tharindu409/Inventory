@@ -38,14 +38,27 @@ const AdminUpdateUser = ({ userId, onClose }) => {
   };
 
   // 3. Submit updated data
-  const handleUpdate = async (e) => {
+ const handleUpdate = async (e) => {
     e.preventDefault();
     try {
+      // 1. Primary Action: Update User
       await axios.put(`http://localhost:8080/user/${userId}`, formData);
+      
+      // 2. Secondary Action: Logging (Defensive)
+      try {
+        await axios.post("http://localhost:8080/log", {
+          action: "UPDATE_USER",
+          performedBy: "Admin",  
+          details: `Updated user: ${formData.fullName} (ID: ${userId}). Role: ${formData.role}.`
+        });
+      } catch (logError) {
+        console.warn("Log failed, but user was updated successfully.");
+      }
+      
       alert("User updated successfully!");
-      onClose(); // This will close the modal and refresh the table in UserManagement
+      onClose(); 
     } catch (error) {
-      alert("Update failed. Please check the backend.");
+      alert("Update failed. Check if email is already taken or backend is down.");
     }
   };
 

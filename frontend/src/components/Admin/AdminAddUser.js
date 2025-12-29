@@ -15,12 +15,18 @@ const AdminAddUser = ({ onClose }) => {
     e.preventDefault();
     try {
       await axios.post("http://localhost:8080/user", formData);
+      await axios.post("http://localhost:8080/log", {
+        action: "ADD_USER",
+        performedBy: "Admin",
+        details: `Created new user account for: ${formData.fullName} with role: ${formData.role}`
+    });
       alert("User created successfully!");
       onClose(); // Close modal and refresh list
     } catch (err) {
       alert("Error creating user: " + err.response?.data?.message);
     }
   };
+  
 
   return (
     <div className="p-4">

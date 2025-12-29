@@ -25,26 +25,33 @@ const UserManagement = () => { // Fixed naming typo
         }
     };
 
-    const deleteUser = async (id, userName) => { // Added userName as parameter
-    const confirmDelete = window.confirm(`Are you sure you want to delete ${userName}?`);
-    if (confirmDelete) {
-      try {
-        // 1. Delete the user
-        await axios.delete(`http://localhost:8080/user/${id}`);
-        
-        // 2. LOG THE ACTION (New Code)
-        await axios.post("http://localhost:8080/log", {
-          action: "DELETE_USER",
-          performedBy: "Admin",
-          details: `Permanently deleted user account: ${userName} (ID: ${id}).`
-        });
+    const deleteUser = async (id) => {
+        // Find user details first so we can log the name
+        const userToDelete = users.find(u => u.id === id);
+        const userName = userToDelete ? userToDelete.fullName : "Unknown User";
 
-        loadUsers(); 
-      } catch (error) {
-        console.error("Failed to delete user", error);
-      }
-    }
-  };
+        const confirmDelete = window.confirm(`Are you sure you want to delete user: ${userName}?`);
+        
+        if (confirmDelete) {
+            try {
+                // 1. Delete the user
+                await axios.delete(`http://localhost:8080/user/${id}`);
+
+                // 2. Log the action
+                await axios.post("http://localhost:8080/log", {
+                    action: "DELETE_USER",
+                    performedBy: "Admin",
+                    details: `Permanently removed user: ${userName} (Email: ${userToDelete?.email})`
+                });
+
+                alert("User deleted and action logged.");
+                loadUsers(); // Refresh list
+            } catch (error) {
+                console.error("Failed to delete user or log action", error);
+                alert("Error during deletion.");
+            }
+        }
+    };
 
     const editUser = (id) => {
         setSelectedUserId(id);

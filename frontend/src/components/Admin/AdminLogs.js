@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import   { useEffect, useState } from "react";
 import axios from "axios";
+ 
 import { 
   FaHistory, 
   FaUserShield, 
@@ -52,6 +53,24 @@ const AdminLogs = () => {
     return <FaHistory className="opacity-50" />;
   };
 
+  // Clear Logs Handler
+
+  const handleClersLogs=()=>{
+    axios.delete("http://localhost:8080/logs/clear")
+
+
+    .then((res)=>{
+
+      alert("All logs have been cleared.");
+      fetchLogs();
+    })
+    
+    .catch((err)=>{
+      console.error("Error clearing logs:", err);
+    }); 
+
+  }
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 10 }} 
@@ -69,6 +88,15 @@ const AdminLogs = () => {
             <p className="text-xs text-gray-400 font-medium">Real-time audit trail of all administrative actions</p>
           </div>
         </div>
+        <button 
+         onClick={handleClersLogs}
+          className="px-4 py-2 text-xs font-bold text-red-500 hover:bg-red-50 rounded-lg transition-all border
+           border-red-100"
+          title="Clear Audit Logs"
+        >
+         Clear History
+        </button>
+ 
         
         <button 
           onClick={fetchLogs}
@@ -77,7 +105,9 @@ const AdminLogs = () => {
         >
           <FaSyncAlt className={loading ? "animate-spin" : ""} />
         </button>
+
       </div>
+
 
       {/* --- TABLE CONTENT --- */}
       <div className="overflow-x-auto">
@@ -151,6 +181,7 @@ const AdminLogs = () => {
         <span>Audit Secure Mode Enabled</span>
       </div>
     </motion.div>
+
   );
 };
 

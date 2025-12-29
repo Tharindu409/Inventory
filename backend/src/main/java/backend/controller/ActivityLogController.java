@@ -25,4 +25,11 @@ public class ActivityLogController {
         return logRepository.findAllByOrderByTimestampDesc();
     }
 
+    //clearLogs
+    @DeleteMapping("/logs/clear")
+    public String clearAllLongs(){
+        logRepository.deleteAll();
+        return "Audit trail cleared successfully";
+    }
+
 }

@@ -7,9 +7,9 @@ const UpdateItem = ({ itemId, onUpdated }) => {
     itemCategory: "",
     itemQty: "",
     itemDetails: "",
-    itemPrice: "",       // New Field
-    minStockLimit: "",   // New Field
-    location: "",         // New Field
+    itemPrice: "",       
+    minStockLimit: "",  
+    location: "",         
     itemImage: null
   });
 
@@ -40,40 +40,49 @@ const UpdateItem = ({ itemId, onUpdated }) => {
   };
 
   const onSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const data = new FormData();
-    
-    // Create the object
-    const itemObject = {
-      itemName: formData.itemName,
-      itemCategory: formData.itemCategory,
-      itemQty: formData.itemQty,
-      itemDetails: formData.itemDetails,
-      itemPrice: formData.itemPrice ? parseFloat(formData.itemPrice) : 0,
-      minStockLimit: formData.minStockLimit ? parseInt(formData.minStockLimit) : 0,
-      location: formData.location
-    };
-
-    // Append as a simple String because your Java code uses String itemDetails
-    data.append("itemDetails", JSON.stringify(itemObject));
-
-    if (formData.itemImage) {
-      data.append("file", formData.itemImage);
-    }
-
-    try {
-      await axios.put(`http://localhost:8080/inventory/${itemId}`, data, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
-
-      alert("Item updated successfully");
-      onUpdated();
-    } catch (err) {
-      console.error("Update failed", err);
-      alert("Update failed. Check if all fields are filled correctly.");
-    }
+  const data = new FormData();
+  
+  // Create the object
+  const itemObject = {
+    itemName: formData.itemName,
+    itemCategory: formData.itemCategory,
+    itemQty: formData.itemQty,
+    itemDetails: formData.itemDetails,
+    itemPrice: formData.itemPrice ? parseFloat(formData.itemPrice) : 0,
+    minStockLimit: formData.minStockLimit ? parseInt(formData.minStockLimit) : 0,
+    location: formData.location
   };
+
+  // Append as a simple String because your Java code uses String itemDetails
+  data.append("itemDetails", JSON.stringify(itemObject));
+
+  if (formData.itemImage) {
+    data.append("file", formData.itemImage);
+  }
+
+  try {
+    // 1. Perform the actual update
+    await axios.put(`http://localhost:8080/inventory/${itemId}`, data, {
+      headers: { "Content-Type": "multipart/form-data" }
+    });
+
+    // 2. LOG THE ACTION (New Code)
+    // We do this inside the 'try' so it only logs if the update worked
+    await axios.post("http://localhost:8080/log", {
+      action: "UPDATE_ITEM",
+      performedBy: "Admin",  
+      details: `Modified item: ${itemObject.itemName} (ID: ${itemId}). Updated stock/details.`
+    });
+
+    alert("Item updated successfully");
+    onUpdated();
+  } catch (err) {
+    console.error("Update failed", err);
+    alert("Update failed. Check if all fields are filled correctly.");
+  }
+};
 
   return (
     <form onSubmit={onSubmit} className="space-y-3">

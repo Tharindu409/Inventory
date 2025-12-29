@@ -38,51 +38,50 @@ const Cart = () => {
     return total + (price * qty);
 }, 0);
 
-  const handleCheckout = async () => {
-    const confirmOrder = window.confirm("Are you sure you want to finalize the order?");
+ const handleCheckout = async () => {
+    const confirmOrder = window.confirm("Finalize this order and reduce stock?");
     if (!confirmOrder) return;
 
     try {
         for (const item of cartItems) {
-            // 1. Get the latest data from DB
+            // 1. Fetch latest data to prevent overwriting other people's updates
             const res = await axios.get(`http://localhost:8080/inventory/${item.id}`);
             const dbItem = res.data;
 
-            // 2. Calculate new quantity (Note: your Backend uses String for itemQty)
-            const currentQty = parseInt(dbItem.itemQty) || 0;
-            const newQty = (currentQty - item.orderQty).toString();
+            // 2. Math logic
+            const currentStock = parseInt(dbItem.itemQty) || 0;
+            const requestedQty = parseInt(item.orderQty) || 0;
+            const finalQty = currentStock - requestedQty;
 
-            if (parseInt(newQty) < 0) {
-                alert(`Not enough stock for ${dbItem.itemName}`);
+            if (finalQty < 0) {
+                alert(`Insufficient stock for ${dbItem.itemName}. Available: ${currentStock}`);
                 return;
             }
 
-            // 3. Create the object exactly as your Backend expects
+            // 3. Prepare Object
             const updatedObject = {
                 ...dbItem,
-                itemQty: newQty
+                itemQty: finalQty.toString()
             };
 
-            // 4. IMPORTANT: Wrap it in FormData to match your Backend "multipart/form-data" requirement
+            // 4. Prepare FormData (Matches Backend @RequestParam names)
             const formData = new FormData();
-            // Your backend expects a part named "itemDetails"
             formData.append("itemDetails", JSON.stringify(updatedObject));
-            // Your backend expects a part named "file" (we send nothing since we aren't changing the image)
-            // formData.append("file", null); 
+            // We do NOT append "file" here because we want to keep the current image
 
-            // 5. Send the request
+            // 5. API Call
             await axios.put(`http://localhost:8080/inventory/${item.id}`, formData, {
                 headers: { "Content-Type": "multipart/form-data" }
             });
         }
 
-        alert("Order finalized! Stock has been reduced.");
+        alert("Success! Stock updated and order finalized.");
         localStorage.removeItem("area52_cart");
         setCartItems([]);
         navigate("/home");
 
     } catch (error) {
-        console.error("Checkout failed:", error);
+        console.error("Server Response:", error.response?.data);
         alert("Error: The server rejected the update. Check console for details.");
     }
 };

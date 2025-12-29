@@ -3,125 +3,113 @@ package backend.controller;
 import backend.exception.InventoryNotFoundException;
 import backend.model.InventModel;
 import backend.repository.InventRepository;
+import backend.service.InventoryService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.Column;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.List;
 
+
+
 @RestController
+@RequestMapping("/inventory")
 @CrossOrigin(origins = "http://localhost:3000")
- public class InventController {
+public class InventController {
+    @Autowired
+    private InventoryService inventoryService;
 
     @Autowired
     private InventRepository inventRepository;
 
-    private final String UPLOAD_DIR = "E:/Download/spring/uploads/";
+    private final String UPLOAD_DIR = System.getProperty("user.dir") + File.separator + "uploads" + File.separator;
 
-    // 1. GET ALL ITEMS (For Home Page)
-    @GetMapping("/inventory")
+    @GetMapping
     public List<InventModel> getAllItems() {
         return inventRepository.findAll();
     }
 
-    // 2. GET SINGLE ITEM BY ID (Crucial for your "View Details" page)
-    @GetMapping("/inventory/{id}")
+    @GetMapping("/{id}")
     public InventModel getItemById(@PathVariable Long id) {
         return inventRepository.findById(id)
                 .orElseThrow(() -> new InventoryNotFoundException(id));
     }
 
-    // 3. CREATE NEW ITEM
-    @PostMapping("/inventory")
-    public InventModel newInventoryModel(@RequestBody InventModel newInventoryModel) {
-        return inventRepository.save(newInventoryModel);
-    }
-
-    // 4. UPLOAD IMAGE
-    @PostMapping("/inventory/itemImg")
-    public String itemImage(@RequestParam("file") MultipartFile file) {
-        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+     @PostMapping("/itemImg")
+    public String uploadImage(@RequestParam("file") MultipartFile file) {
         try {
             File dir = new File(UPLOAD_DIR);
             if (!dir.exists()) dir.mkdirs();
-            file.transferTo(Paths.get(UPLOAD_DIR + fileName));
+            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+            file.transferTo(new File(UPLOAD_DIR + fileName));
+            return fileName;
         } catch (IOException e) {
-            return "error uploading file";
+            return "error";
         }
-        return fileName;
     }
 
-    //  IMAGE TO FRONTEND
-    @GetMapping("/uploads/{filename}")
-    public ResponseEntity<FileSystemResource> getImage(@PathVariable String filename) {
-        File file = new File(UPLOAD_DIR + filename);
-        if (!file.exists()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(new FileSystemResource(file));
+    // 2. Handle Saving Item Data
+    @PostMapping
+    public InventModel saveItem(@RequestBody InventModel item) {
+        return inventRepository.save(item);
     }
 
-    //update
-
-    @PutMapping(value = "/inventory/{id}", consumes = "multipart/form-data")
+    // 3. Handle Updates (Multipart for Edit/Cart)
+    @PutMapping("/{id}")
     public InventModel updateItem(
-            @RequestPart("itemDetails") String itemDetails,
-            @RequestPart(value = "file", required = false) MultipartFile file,
-            @PathVariable Long id
-    ) {
-        ObjectMapper mapper = new ObjectMapper();
-        InventModel newInventory;
-        try {
-            newInventory = mapper.readValue(itemDetails, InventModel.class);
-        } catch (Exception e) {
-            throw new RuntimeException("Error parsing itemDetails", e);
-        }
+            @PathVariable Long id,
+            @RequestParam("itemDetails") String itemDetails,
+            @RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
 
-        return inventRepository.findById(id).map(existingInventory -> {
-            existingInventory.setItemName(newInventory.getItemName());
-            existingInventory.setItemCategory(newInventory.getItemCategory());
-            existingInventory.setItemQty(newInventory.getItemQty());
-            existingInventory.setItemDetails(newInventory.getItemDetails());
+        ObjectMapper objectMapper = new ObjectMapper();
+        InventModel newDetails = objectMapper.readValue(itemDetails, InventModel.class);
 
-            // ADD THESE NEW FIELDS TO YOUR REPOSITORY SAVE LOGIC
-            existingInventory.setItemPrice(newInventory.getItemPrice());
-            existingInventory.setMinStockLimit(newInventory.getMinStockLimit());
-            existingInventory.setLocation(newInventory.getLocation());
+        return inventRepository.findById(id).map(item -> {
+            item.setItemName(newDetails.getItemName());
+            item.setItemCategory(newDetails.getItemCategory());
+            item.setItemQty(newDetails.getItemQty());
+            item.setItemPrice(newDetails.getItemPrice());
+            item.setLocation(newDetails.getLocation());
 
             if (file != null && !file.isEmpty()) {
                 String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
                 try {
-                    file.transferTo(Paths.get(UPLOAD_DIR + fileName));
-                    existingInventory.setItemImage(fileName);
-                } catch (IOException e) {
-                    throw new RuntimeException("Error saving file", e);
-                }
+                    file.transferTo(new File(UPLOAD_DIR + fileName));
+                    item.setItemImage(fileName);
+                } catch (IOException e) { e.printStackTrace(); }
+            } else {
+                item.setItemImage(newDetails.getItemImage());
             }
-            return inventRepository.save(existingInventory);
+
+            return inventRepository.save(item);
         }).orElseThrow(() -> new InventoryNotFoundException(id));
     }
 
-    // 7. DELETE ITEM
-    @DeleteMapping("/inventory/{id}")
+    @DeleteMapping("/{id}")
     public String deleteItem(@PathVariable Long id) {
-        InventModel inventItem = inventRepository.findById(id)
-                .orElseThrow(() -> new InventoryNotFoundException(id));
-
-        // Delete image file if exists
-        String itemImage = inventItem.getItemImage();
-        if (itemImage != null && !itemImage.isEmpty()) {
-            File imageFile = new File(UPLOAD_DIR + itemImage);
-            if (imageFile.exists()) {
-                imageFile.delete();
-            }
+        if (!inventRepository.existsById(id)) {
+            throw new InventoryNotFoundException(id);
         }
-
         inventRepository.deleteById(id);
-        return "Item with ID " + id + " deleted successfully.";
+        return "Deleted successfully";
     }
+
+    // MASS UPDATE ENDPOINT (Unique path to avoid ID conflict)
+    @PutMapping("/action/mass-update-price")
+    public ResponseEntity<String> massUpdatePrice(@RequestParam double percentage) {
+        try {
+            inventoryService.updateAllPrices(percentage);
+            return ResponseEntity.ok("Successfully updated prices");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Update failed");
+        }
+    }
+
 }

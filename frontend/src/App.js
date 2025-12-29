@@ -12,6 +12,8 @@ import ItemDetails from "./components/ItemDetails/ItemDetails";
 import Cart from "./components/ItemDetails/Cart";
 import UserProfile from "./components/User/UserProfile/UserProfile";
 import UpdateProfile from "./components/User/UserProfile/UpdateProfile";
+import Contact from "./components/3. Contact.js";
+import FAQ from "./components/FAQ.js";
 
 const AdminRoute = ({ children }) => {
   const userRole = localStorage.getItem("userRole");
@@ -53,6 +55,8 @@ function App() {
         
         {/* Shopping */}
         <Route path="/order" element={<Cart/>}/>
+        <Route path="/contact" element={<Contact/>}/>
+        <Route path="/faq" element={<FAQ/>}/>
       </Routes>
       <Footer/>
     </>
