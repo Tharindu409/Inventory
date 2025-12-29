@@ -23,4 +23,21 @@ Create a MySQL database and update `backend/src/main/resources/application.prope
 spring.datasource.url=jdbc:mysql://localhost:3306/your_db_name
 spring.datasource.username=your_username
 spring.datasource.password=your_password
+2. Run Backend
+Bash
+
+cd backend
+./mvnw spring-boot:run
+3. Run Frontend
+Bash
+
+cd frontend
+npm install
+npm start
+📂 Project Structure
+backend/ - Spring Boot source code and API logic.
+
+frontend/ - React components and user interface.
+
+uploads/ - Directory for stored inventory images.
 
