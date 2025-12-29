@@ -36,7 +36,7 @@ public class UserController {
         }
     }
 
-    // SIMPLE LOGIN (No JWT)
+    // SIMPLE LOGIN
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserModel loginDetails) {
         return userRepository.findByEmail(loginDetails.getEmail())

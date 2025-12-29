@@ -70,7 +70,12 @@ public class InventModel {
     public String getItemQty() { return itemQty; }
     public void setItemQty(String itemQty) { this.itemQty = itemQty; }
 
-    public String getItemDetails() { return itemDetails; }
-    public void setItemDetails(String itemDetails) { this.itemDetails = itemDetails; }
+    public String getItemDetails() {
+        return itemDetails;
+    }
+
+    public void setItemDetails(String itemDetails) {
+        this.itemDetails = itemDetails;
+    }
 }
 

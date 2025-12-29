@@ -4,6 +4,7 @@ import backend.exception.InventoryNotFoundException;
 import backend.model.InventModel;
 import backend.repository.InventRepository;
 import backend.service.InventoryService;
+import backend.service.QRCodeGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.Column;
 import org.hibernate.annotations.CreationTimestamp;
@@ -101,6 +102,7 @@ public class InventController {
         return "Deleted successfully";
     }
 
+
     // MASS UPDATE ENDPOINT (Unique path to avoid ID conflict)
     @PutMapping("/action/mass-update-price")
     public ResponseEntity<String> massUpdatePrice(@RequestParam double percentage) {
@@ -109,6 +111,26 @@ public class InventController {
             return ResponseEntity.ok("Successfully updated prices");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Update failed");
+        }
+    }
+
+    //for QR code generator
+    @GetMapping("/{id}/qrcode")
+    public ResponseEntity<String> getQRCode(@PathVariable Long id) {
+        try {
+            // 1. Get your computer's IP address (e.g., 192.168.1.10)
+            // Note: Using "localhost" won't work on your mobile phone's camera!
+            String myIp = "192.168.78.123"; // <--- CHANGE THIS to your actual IP from 'ipconfig'
+
+             String qrContent = "http://" + myIp + ":5173/inventory/edit/" + id;
+
+             String base64Image = QRCodeGenerator.getQRCodeImage(qrContent, 250, 250);
+
+            return ResponseEntity.ok(base64Image);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Error generating QR");
         }
     }
 

@@ -50,6 +50,7 @@ const Home = () => {
         const matchesPrice = maxPrice === "" || item.itemPrice <= parseFloat(maxPrice);
         
         return matchesSearch && matchesCategory && matchesPrice;
+        
       });
 
       // Handle Sorting

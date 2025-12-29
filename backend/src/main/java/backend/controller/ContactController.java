@@ -16,6 +16,7 @@ public class ContactController {
     @Autowired
     private ContactRepository contactRepository;
 
+
     // 1. SUBMIT MESSAGE (Used by Users on Contact Page)
     @PostMapping("/submit")
     public ResponseEntity<String> submitMessage(@RequestBody ContactMessage message) {
@@ -25,6 +26,7 @@ public class ContactController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error sending message: " + e.getMessage());
         }
+
     }
 
     // 2. GET ALL MESSAGES (Used by Admin Dashboard)

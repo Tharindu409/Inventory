@@ -42,6 +42,7 @@ const AdminLogs = () => {
     if (act.includes("STOCK") || act.includes("QTY")) return "bg-orange-100 text-orange-700 border-orange-200";
     if (act.includes("CREATE") || act.includes("ADD")) return "bg-green-100 text-green-700 border-green-200";
     if (act.includes("ROLE") || act.includes("PERMISSION")) return "bg-purple-100 text-purple-700 border-purple-200";
+
     return "bg-blue-100 text-blue-700 border-blue-200";
   };
 
@@ -145,14 +146,16 @@ const AdminLogs = () => {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500 uppercase border border-slate-200">
+                      <div className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center 
+                      text-[10px] font-bold text-slate-500 uppercase border border-slate-200">
                         {log.performedBy?.charAt(0) || "A"}
                       </div>
                       <span className="text-sm font-bold text-gray-700">{log.performedBy}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black border uppercase ${getBadgeStyle(log.action)}`}>
+                    <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] 
+                      font-black border uppercase ${getBadgeStyle(log.action)}`}>
                       {getActionIcon(log.action)}
                       {log.action}
                     </div>
@@ -176,7 +179,8 @@ const AdminLogs = () => {
       </div>
 
       {/* --- FOOTER HINT --- */}
-      <div className="p-4 bg-gray-50/50 border-t border-gray-100 flex justify-between items-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+      <div className="p-4 bg-gray-50/50 border-t border-gray-100 flex justify-between items-center 
+      text-[10px] font-bold text-gray-400 uppercase tracking-widest">
         <span>Showing {logs.length} Total Events</span>
         <span>Audit Secure Mode Enabled</span>
       </div>

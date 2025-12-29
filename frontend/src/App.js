@@ -17,14 +17,15 @@ import FAQ from "./components/FAQ.js";
 import ForgotPassword from "../../frontend/src/components/User/ForgotPassword.js";
 import ResetPassword from "../../frontend/src/components/User/ResetPassword.js";
 import AdminMessages from "./components/Admin/AdminMessages";
+import UpdateItemPage from "./components/ItemManagement/UpdateItem.js";
+ 
 
 
 const AdminRoute = ({ children }) => {
   const userRole = localStorage.getItem("userRole");
   
   if (userRole !== "ADMIN") {
-    // If not admin, redirect to home or show an error
-    return <Home />;
+     return <Home />;
   }
   
   return children;
@@ -66,6 +67,7 @@ function App() {
         <Route path="/reset-password" element={<ResetPassword/>}/>
 
         <Route path="/admin/messages" element={<AdminMessages />} />
+        <Route path="/inventory/edit/:id" element={<UpdateItemPage />} />
 
       </Routes>
       <Footer/>
