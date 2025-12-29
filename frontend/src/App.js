@@ -14,6 +14,10 @@ import UserProfile from "./components/User/UserProfile/UserProfile";
 import UpdateProfile from "./components/User/UserProfile/UpdateProfile";
 import Contact from "./components/3. Contact.js";
 import FAQ from "./components/FAQ.js";
+import ForgotPassword from "../../frontend/src/components/User/ForgotPassword.js";
+import ResetPassword from "../../frontend/src/components/User/ResetPassword.js";
+import AdminMessages from "./components/Admin/AdminMessages";
+
 
 const AdminRoute = ({ children }) => {
   const userRole = localStorage.getItem("userRole");
@@ -57,6 +61,12 @@ function App() {
         <Route path="/order" element={<Cart/>}/>
         <Route path="/contact" element={<Contact/>}/>
         <Route path="/faq" element={<FAQ/>}/>
+
+        <Route path="/forgot-password" element={<ForgotPassword/>}/>
+        <Route path="/reset-password" element={<ResetPassword/>}/>
+
+        <Route path="/admin/messages" element={<AdminMessages />} />
+
       </Routes>
       <Footer/>
     </>

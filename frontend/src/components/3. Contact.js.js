@@ -1,9 +1,42 @@
-import React from 'react';
+import React, { useState } from 'react'; // 1. Added useState
 import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaPaperPlane } from 'react-icons/fa';
+import axios from 'axios'; // 2. Import axios
+import { toast, Toaster } from 'react-hot-toast'; // 3. For feedback
 
 const Contact = () => {
+  // 4. Form state
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: 'Support Request', // Default subject
+    message: ''
+  });
+  const [loading, setLoading] = useState(false);
+
+  // 5. Handle form submission
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // 6. Connect to your Spring Boot endpoint
+      const response = await axios.post("http://localhost:8080/api/contact/submit", formData);
+      
+      if (response.status === 200) {
+        toast.success("Message sent! We'll get back to you soon.");
+        setFormData({ name: '', email: '', subject: 'Support Request', message: '' }); // Clear form
+      }
+    } catch (err) {
+      toast.error("Failed to send message. Please try again.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900 py-16 px-6">
+      <Toaster position="top-center" />
       <div className="max-w-6xl mx-auto">
         
         {/* Header */}
@@ -53,10 +86,13 @@ const Contact = () => {
 
           {/* Right Side: Simple Form */}
           <div className="bg-white dark:bg-slate-800 p-8 rounded-3xl border border-gray-100 dark:border-slate-700 shadow-xl">
-            <form className="space-y-4">
+            <form onSubmit={onSubmit} className="space-y-4">
               <div>
                 <input 
                   type="text" 
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
                   placeholder="Your Name" 
                   className="w-full p-4 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 dark:text-white outline-none focus:border-green-500" 
                 />
@@ -64,6 +100,9 @@ const Contact = () => {
               <div>
                 <input 
                   type="email" 
+                  required
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
                   placeholder="Email Address" 
                   className="w-full p-4 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 dark:text-white outline-none focus:border-green-500" 
                 />
@@ -71,12 +110,19 @@ const Contact = () => {
               <div>
                 <textarea 
                   rows="4" 
+                  required
+                  value={formData.message}
+                  onChange={(e) => setFormData({...formData, message: e.target.value})}
                   placeholder="How can we help?" 
                   className="w-full p-4 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 dark:text-white outline-none focus:border-green-500"
                 ></textarea>
               </div>
-              <button className="w-full bg-green-600 py-4 rounded-xl text-white font-bold hover:bg-green-700 transition flex items-center justify-center gap-2">
-                <FaPaperPlane /> Send Message
+              <button 
+                type="submit"
+                disabled={loading}
+                className="w-full bg-green-600 py-4 rounded-xl text-white font-bold hover:bg-green-700 transition flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {loading ? "Sending..." : <><FaPaperPlane /> Send Message</>}
               </button>
             </form>
           </div>

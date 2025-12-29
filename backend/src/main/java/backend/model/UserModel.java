@@ -1,9 +1,8 @@
 package backend.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 
 @Entity
 public class UserModel {
@@ -12,9 +11,29 @@ public class UserModel {
     private Long id;
     private String fullName;
     private String email;
+    @Column(length = 255)
     private String password;
     private String phone;
     private String role;
+    private String resetToken;
+    private LocalDateTime tokenExpiry;
+
+
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+
+    public LocalDateTime getTokenExpiry() {
+        return tokenExpiry;
+    }
+
+    public void setTokenExpiry(LocalDateTime tokenExpiry) {
+        this.tokenExpiry = tokenExpiry;
+    }
 
     public String getRole() {
         return role;

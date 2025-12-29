@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { 
   FaUser, FaUsers, FaBoxes, FaClipboardList, 
-  FaChartBar, FaShieldAlt, FaHistory, FaMoon, FaSun, FaBell 
+  FaChartBar, FaShieldAlt, FaHistory, FaMoon, FaSun, FaEnvelope,FaBell 
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import ItemManagement from "../ItemManagement/ItemManagement";
 import UsersManagement from "../../components/UserManagement/UserMAnagement";
 import AdminLogs from "../../components/Admin/AdminLogs";
+import AdminMessages from "../../components/Admin/AdminMessages";
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -48,6 +49,7 @@ const AdminDashboard = () => {
           <SidebarItem icon={<FaBoxes />} label="Inventory" active={activeTab === "item"} onClick={() => setActiveTab("item")} />
           <SidebarItem icon={<FaUser />} label="User Access" active={activeTab === "users"} onClick={() => setActiveTab("users")} />
           <SidebarItem icon={<FaHistory />} label="Audit Logs" active={activeTab === "logs"} onClick={() => setActiveTab("logs")} />
+          <SidebarItem icon={<FaEnvelope />} label="Messages" active={activeTab === "messages"} onClick={() => setActiveTab("messages")} />
         </nav>
 
         <div className="p-8">
@@ -153,6 +155,11 @@ const AdminDashboard = () => {
             {activeTab === "logs" && (
               <motion.div key="logs" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
                 <AdminLogs />
+              </motion.div>
+            )}
+            {activeTab === "messages" && (
+              <motion.div key="messages" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+                <AdminMessages />
               </motion.div>
             )}
           </AnimatePresence>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { HiEye, HiEyeOff } from "react-icons/hi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom"; // 1. Added Link to imports
 
 const Login = ({ onClose }) => {
   const [email, setEmail] = useState("");
@@ -18,7 +18,6 @@ const Login = ({ onClose }) => {
     setMessage("");
 
     try {
-      // POSTing to your non-JWT login endpoint
       const response = await axios.post("http://localhost:8080/login", {
         email,
         password 
@@ -26,24 +25,17 @@ const Login = ({ onClose }) => {
 
       const data = response.data;
 
-      // 1. In a non-JWT setup, success is usually indicated by receiving 
-      // the user object or a success status.
       if (data && data.id) {
-        // 2. Save user info to LocalStorage (No token needed)
         localStorage.setItem("userId", data.id);
         localStorage.setItem("userRole", data.role);
         localStorage.setItem("fullName", data.fullName || "User");
-        localStorage.setItem("isLoggedIn", "true"); // Helper flag
+        localStorage.setItem("isLoggedIn", "true");
 
-        // 3. Notify other components (Navbar/Sidebar)
         window.dispatchEvent(new Event("storage"));
-
         setMessage("Login successful!");
 
-        // 4. Navigate based on Role
         setTimeout(() => {
           if (onClose) onClose();
-          
           if (data.role === "ADMIN") {
             navigate("/AdminDashboard");
           } else {
@@ -54,7 +46,6 @@ const Login = ({ onClose }) => {
         setMessage("Invalid credentials. Please try again.");
       }
     } catch (err) {
-      // Handles 401 Unauthorized or 404 Not Found
       const errorMsg = err.response?.data?.message || "Login failed. Check backend connectivity.";
       setMessage(errorMsg);
     } finally {
@@ -68,7 +59,6 @@ const Login = ({ onClose }) => {
         onSubmit={onSubmit}
         className="relative w-full max-w-sm rounded-2xl bg-white dark:bg-slate-900 shadow-2xl p-8 border border-gray-100"
       >
-        {/* Close Button */}
         <button
           type="button"
           onClick={onClose}
@@ -93,7 +83,6 @@ const Login = ({ onClose }) => {
         )}
 
         <div className="space-y-4">
-          {/* Email */}
           <div>
             <label className="text-xs font-bold text-gray-500 uppercase ml-1">Email Address</label>
             <input
@@ -106,7 +95,6 @@ const Login = ({ onClose }) => {
             />
           </div>
 
-          {/* Password */}
           <div>
             <label className="text-xs font-bold text-gray-500 uppercase ml-1">Password</label>
             <div className="relative mt-1">
@@ -126,13 +114,24 @@ const Login = ({ onClose }) => {
                 {showPassword ? <HiEyeOff size={20} /> : <HiEye size={20} />}
               </button>
             </div>
+            
+            {/* 2. Added Forgot Password Link Here */}
+            <div className="text-right mt-2">
+              <Link 
+                to="/forgot-password" 
+                onClick={onClose} // Closes modal if login is a modal
+                className="text-xs font-semibold text-gray-500 hover:text-green-600 transition"
+              >
+                Forgot Password?
+              </Link>
+            </div>
           </div>
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full mt-8 rounded-xl bg-slate-900 py-3 text-white font-bold hover:bg-green-600 transition-all shadow-lg disabled:opacity-50 active:scale-95"
+          className="w-full mt-6 rounded-xl bg-slate-900 py-3 text-white font-bold hover:bg-green-600 transition-all shadow-lg disabled:opacity-50 active:scale-95"
         >
           {loading ? "Verifying..." : "Sign In"}
         </button>
